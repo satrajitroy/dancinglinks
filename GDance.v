@@ -1,3 +1,40 @@
+(** * GDance : Verified Functional Dancing Links with Colored Constraints
+
+    This file contains a functional Rocq implementation of a Knuth-style
+    Algorithm X / Dancing Links solver, extended with colored secondary
+    constraints.
+
+    The development is organized into four layers:
+
+    - A small generic data model for rows, columns, colored items, and problems.
+    - A purely functional solver based on [cover], [purify], [commit], and
+      recursive search.
+    - A soundness proof showing that every returned solution is valid for a
+      well-formed problem.
+    - Public problem-generator APIs for Sudoku-like problems, warehouse and
+      scheduling-style problems, combinatorics, N-Queens, Langford pairs, and
+      van der Waerden-style generated colorings.
+
+    The extracted OCaml/Melange/JavaScript artifact is intended to power a
+    browser demo.  Large examples may exceed browser recursion or memory limits;
+    those are runtime limits of the JavaScript environment, not claims about the
+    mathematical solver specification.
+
+    The main exported guarantee is:
+
+    [[
+      solve_sound :
+        forall fuel p sol,
+          problem_wf p ->
+          In sol (solve fuel p) ->
+          valid_solution p sol
+    ]]
+
+    Informally: every solution returned by [solve] is composed of problem rows,
+    covers each primary item exactly once, and satisfies pairwise colored
+    compatibility.
+*)
+
 (******************************************************************************
  * GDance.v
  *
@@ -23,6 +60,23 @@ Open Scope string_scope.
 Module GDance.
 
   Set Implicit Arguments.
+
+      (** ** Boolean equality and equality laws
+
+        The solver is polymorphic in the types of item columns, colors, and row
+        identifiers.  Instead of requiring decidable equality from the standard
+        library directly, the executable code uses a small [Eqb] class.
+
+        The proof layer assumes [EqbLaws], which connects executable boolean
+        equality to propositional equality:
+
+        [[
+          eqb x y = true <-> x = y
+        ]]
+
+        This separation keeps the extracted solver simple while giving the proof
+        scripts enough logical strength to reason about equality soundly.
+    *)
 
     (******************************************************************************)
     (* Basic decidable equality layer                                               *)
@@ -59,6 +113,26 @@ Module GDance.
       intros x y.
       apply String.eqb_eq.
     Qed.
+
+    (** ** Core data model
+
+        A [citem] is a column occurrence inside a row.
+
+        - [ci_col] is the logical column.
+        - [ci_color] is [None] for an ordinary/uncolored occurrence.
+        - [ci_color = Some c] represents a colored occurrence.
+
+        A [row] has a row identifier and a list of [citem]s.
+
+        A [problem] consists of:
+
+        - [primary_items], which must be covered exactly once by a solution;
+        - [rows], the candidate rows available to the solver.
+
+        Columns that appear in rows but are not listed in [primary_items] behave as
+        secondary constraints.  Uncolored secondary columns conflict if shared.
+        Colored secondary columns may coexist only when their colors are compatible.
+    *)
 
     (******************************************************************************)
     (* Core data model                                                              *)
@@ -97,6 +171,31 @@ Module GDance.
 
   Section FunctionalGDance.
 
+    (** ** Functional Algorithm X / GDance solver
+
+        This section contains the executable solver.
+
+        The implementation follows the spirit of Knuth's Dancing Links algorithm,
+        but uses immutable lists and structural recursion rather than pointers and
+        mutation.
+
+        The key operations are:
+
+        - [cover], which removes a primary/uncolored column from the remaining
+          problem;
+        - [purify], which keeps only rows compatible with a chosen colored column;
+        - [commit], which applies the consequences of choosing one row;
+        - [choose_col], which chooses the next primary column to branch on;
+        - [search], which recursively enumerates solutions subject to a fuel bound;
+        - [solve], the public solver over rows;
+        - [solve_ids], a convenience wrapper returning row identifiers.
+
+        The [fuel] parameter is an explicit termination bound.  Soundness does not
+        require fuel adequacy: any solution returned within the given fuel is valid.
+        Completeness requires a separate fuel-adequacy theorem and is intentionally
+        not claimed here.
+    *)
+
     Context {Item Color RowId : Type}.
     Context `{Eqb Item}.
     Context `{Eqb Color}.
@@ -108,6 +207,12 @@ Module GDance.
 
 
     Section Code.
+
+      (** *** Executable definitions
+
+          The definitions in this subsection are computational and survive extraction.
+          Proofs and propositions in later subsections are erased by extraction.
+      *)
 
       Definition row_eqb (r s : row Item Color RowId) : bool :=
         eqb (row_id r) (row_id s).
@@ -326,6 +431,25 @@ Module GDance.
 
     Section Proofs.
 
+      (** ** Problem well-formedness and solution validity
+
+          The solver is proved sound for well-formed problems.
+
+          The well-formedness predicate records the assumptions under which the
+          generic solver behaves as intended.  In particular, generated Sudoku,
+          warehouse, and combinatorics APIs are expected to produce problems satisfying
+          these invariants.
+
+          A [valid_solution] consists of three semantic properties:
+
+          - every selected row comes from the original problem;
+          - every primary item is covered exactly once;
+          - selected rows are pairwise compatible, including colored secondary
+            compatibility.
+
+          This predicate is the mathematical specification used by [solve_sound].
+      *)
+
       Definition rows_from_problem
         (p : problem Item Color RowId)
         (sol : list (row Item Color RowId))
@@ -394,6 +518,27 @@ Module GDance.
         Forall row_no_duplicate_columns (rows p) /\
         rows_have_unique_ids (rows p) /\
         primary_items_uncolored p.
+
+      (** ** Soundness proof structure
+
+          The soundness proof is organized around the behavior of [commit].
+
+          The central characterization lemma is [commit_rows_characterization], which
+          describes exactly which rows survive after a chosen row is committed.
+
+          From that characterization we derive:
+
+          - [commit_preserves_problem_wf], showing that recursive calls remain
+            well-formed;
+          - [commit_removes_conflicts_with_chosen], showing that surviving rows do not
+            conflict with the chosen row;
+          - [commit_primary_exactly_once_lift], showing that primary exactness lifts
+            from the recursive subproblem back to the original problem;
+          - [commit_solution_lifts], combining row membership, primary coverage, and
+            compatibility.
+
+          These lemmas feed the main theorem [solve_sound].
+      *)
 
       Lemma empty_solution_valid_when_no_primaries :
         forall (p : problem Item Color RowId),
@@ -1549,6 +1694,15 @@ Module GDance.
               -- exact Hneq.
       Qed.
 
+      (** ** Main soundness theorem
+
+          [solve_sound] states that every solution returned by the solver is valid.
+
+          This is a _partial correctness_ theorem: it says that returned answers are
+          correct.  It does not claim that every valid solution is returned, nor that
+          the fuel bound is sufficient.
+      *)
+
       Theorem solve_sound :
         forall fuel p sol,
           problem_wf p ->
@@ -1759,6 +1913,36 @@ Module Examples.
 End Examples.
 
 End GDance.
+
+(** ** Sudoku-style problem generators
+
+    [SudokuProblem] builds exact-cover problems for generalized Sudoku-like
+    grids.
+
+    The generated candidate universe contains one row for each possible placement
+    of a symbol in a cell.  A row covers:
+
+    - the cell constraint;
+    - the row-symbol constraint;
+    - the column-symbol constraint;
+    - the box-symbol constraint.
+
+    Two public encodings are provided:
+
+    - [generalized_sudoku_problem_exact], where all Sudoku constraints are
+      primary and therefore exactly-once;
+    - [generalized_sudoku_problem_at_most], where cells are primary and
+      row/column/box symbol constraints act as at-most-once secondary
+      constraints.
+
+    The at-most version is useful for rectangular generalized cases where row
+    length, column height, box size, and alphabet size do not all coincide.
+
+    The [*_with_givens] variants restrict the candidate universe according to
+    fixed cell values.  The [generated_solution_rows] and
+    [generated_solution_ids] helpers build a known solution from a function
+    [row -> col -> sym].
+*)
 
 Module SudokuProblem.
   Import GDance.
@@ -2255,6 +2439,23 @@ From Coq Require Import List String Ascii Arith Bool.
 Import ListNotations.
 Open Scope string_scope.
 
+(** ** Generated warehouse / scheduling-style problems
+
+    This module builds warehouse-style exact-cover problems.
+
+    Primary columns represent required items.  Source columns appear in rows as
+    secondary constraints and may be colored.  This models situations such as
+    assigning items, tasks, or jobs to sources, machines, workers, or time slots.
+
+    The guaranteed-k constructors generate a family of witness solutions by
+    deterministically partitioning items among sources.  The construction
+    guarantees at least [k] intended solutions by design.
+
+    In this file we expose the generator as a public API and rely on the generic
+    solver soundness theorem for returned-solution validity.  Deeper generator
+    guarantees may be proved separately and reused rather than duplicated here.
+*)
+
 Module Guaranteed_K_Warehouse.
 
   Import GDance.
@@ -2674,6 +2875,31 @@ End Guaranteed_K_WarehouseExamples.
 
 From Coq Require Import List Arith Bool.
 Import ListNotations.
+
+(** ** Combinatorics problem generators
+
+    This module exposes a collection of small exact-cover encodings suitable for
+    demos and regression tests.
+
+    Included families:
+
+    - tuples and permutations;
+    - combinations;
+    - integer partitions;
+    - set partitions;
+    - multiset partitions;
+    - N-Queens;
+    - Langford pairs;
+    - van der Waerden-style generated colorings.
+
+    Some APIs encode each mathematical object as a single DLX row using the
+    primary column [PickOne].  Others encode a mathematical object as a set of
+    selected rows, such as N-Queens or set partitions.
+
+    The browser demo decodes row identifiers into user-facing mathematical
+    objects.  The row identifiers remain useful as a compact, stable trace of
+    the exact-cover solution.
+*)
 
 Module Combinatorics.
 
@@ -3185,6 +3411,21 @@ Module Combinatorics.
       (qrows n ++ qcols n)
       (queen_rows n).
 
+  (** *** Langford pairs
+
+      A Langford pairing of order [n] places two copies of each value [1..n] into
+      [2*n] slots so that the two copies of [k] have exactly [k] slots between
+      them.
+
+      Each candidate row chooses a value [k] and a starting slot [start], covering:
+
+      - [Slot start];
+      - [Slot (start + k + 1)];
+      - [Value k].
+
+      The resulting exact cover fills all slots and uses each value exactly once.
+  *)
+
   (******************************************************************************)
   (* Langford pairs                                                              *)
   (*                                                                            *)
@@ -3245,6 +3486,17 @@ Module Combinatorics.
     make_problem
       (langford_slots n ++ langford_values n)
       (langford_rows n).
+
+  (** *** Van der Waerden-style generated colorings
+
+      This API generates all [q]-colorings of [0..n-1], filters out those with a
+      monochromatic arithmetic progression of length [k], and exposes the remaining
+      colorings as a [PickOne] exact-cover problem.
+
+      This is intentionally a generated-solution-universe encoding.  The constraint
+      "not all [k] positions in an arithmetic progression have the same color" is
+      not naturally an at-most-one DLX constraint when [k >= 3].
+  *)
 
 
   (******************************************************************************)
@@ -3864,6 +4116,20 @@ Module CombinatoricsGDanceExamples.
   Qed.
 
 End CombinatoricsGDanceExamples.
+
+(** ** Public extraction API
+
+    [PublicAPI] contains specialized wrappers intended for OCaml/Melange/React.
+
+    The generic [solve_ids] function is polymorphic and expects equality
+    dictionaries.  That shape is convenient in Rocq but awkward from JavaScript.
+
+    The [api_*_ids] functions close over the appropriate equality instances on
+    the Rocq side.  JavaScript callers therefore pass only ordinary numeric
+    parameters, converted to extracted Rocq naturals by the frontend adapter.
+
+    These wrappers are the intended public extraction roots.
+*)
 
 Module PublicAPI.
 
