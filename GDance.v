@@ -53,7 +53,7 @@
  * global arrays, and destructive circular lists.
  ******************************************************************************)
 
-From Coq Require Import List Bool Arith String.
+From Stdlib Require Import List Bool Arith String.
 Import ListNotations.
 Open Scope string_scope.
 
@@ -2172,7 +2172,7 @@ Module SudokuProblem.
 
 End SudokuProblem.
 
-From Coq Require Import List Arith Bool.
+From Stdlib Require Import List Arith Bool.
 Import ListNotations.
 
 Module SudokuProblemExamples.
@@ -2435,7 +2435,7 @@ Module SudokuProblemExamples.
   Qed.
 End SudokuProblemExamples.
 
-From Coq Require Import List String Ascii Arith Bool.
+From Stdlib Require Import List String Ascii Arith Bool.
 Import ListNotations.
 Open Scope string_scope.
 
@@ -2873,7 +2873,7 @@ Module Guaranteed_K_WarehouseExamples.
 
 End Guaranteed_K_WarehouseExamples.
 
-From Coq Require Import List Arith Bool.
+From Stdlib Require Import List Arith Bool.
 Import ListNotations.
 
 (** ** Combinatorics problem generators

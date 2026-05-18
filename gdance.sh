@@ -52,6 +52,32 @@ require_cmd() {
   command -v "$1" >/dev/null 2>&1 || die "Missing command: $1"
 }
 
+rocq_compile() {
+  log "Compiling GDance.v to generate .vo/.glob"
+
+  if command -v rocq >/dev/null 2>&1; then
+    rocq compile GDance.v
+  elif command -v coqc >/dev/null 2>&1; then
+    coqc GDance.v
+  else
+    die "Neither rocq nor coqc was found"
+  fi
+}
+
+rocq_doc() {
+  log "Generating Rocq documentation"
+
+  mkdir -p docs/coqdoc
+
+  if command -v rocq >/dev/null 2>&1; then
+    rocq doc --html -g -toc -d docs/coqdoc GDance.v
+  elif command -v coqdoc >/dev/null 2>&1; then
+    coqdoc --html -g -toc -d docs/coqdoc GDance.v
+  else
+    die "Neither rocq doc nor coqdoc was found"
+  fi
+}
+
 resolve_frontend_dir() {
   local requested="${FRONTEND_DIR:-frontend}"
 
@@ -90,6 +116,8 @@ require_cmd rsync
 [ -d "$FRONTEND_DIR" ] || die "FRONTEND_DIR does not exist: $FRONTEND_DIR"
 [ -f "$FRONTEND_DIR/package.json" ] || die "No package.json found in $FRONTEND_DIR"
 
+
+
 ###############################################################################
 # Activate OPAM environment
 ###############################################################################
@@ -111,6 +139,9 @@ mkdir -p "$MELANGE_DEST"
 ###############################################################################
 # Build Melange
 ###############################################################################
+
+rocq_compile
+rocq_doc
 
 log "Building Melange target: dune build $DUNE_TARGET"
 
