@@ -67,15 +67,18 @@ rocq_compile() {
 rocq_doc() {
   log "Generating Rocq documentation"
 
-  mkdir -p docs/coqdoc
+  mkdir -p "$ROOT_DIR/docs/coqdoc"
+  mkdir -p "$ROOT_DIR/frontend/public/coqdoc"
 
   if command -v rocq >/dev/null 2>&1; then
-    rocq doc --html -g -toc -d docs/coqdoc GDance.v
+    rocq doc --html -g -toc -d "$ROOT_DIR/docs/coqdoc" "$ROOT_DIR/GDance.v"
   elif command -v coqdoc >/dev/null 2>&1; then
-    coqdoc --html -g -toc -d docs/coqdoc GDance.v
+    coqdoc --html -g -toc -d "$ROOT_DIR/docs/coqdoc" "$ROOT_DIR/GDance.v"
   else
     die "Neither rocq doc nor coqdoc was found"
   fi
+
+  rsync -a --delete "$ROOT_DIR/docs/coqdoc/" "$ROOT_DIR/frontend/public/coqdoc/"
 }
 
 resolve_frontend_dir() {

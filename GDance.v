@@ -1,24 +1,40 @@
 (** * GDance : Verified Functional Dancing Links with Colored Constraints
 
-    This file contains a functional Rocq implementation of a Knuth-style
-    Algorithm X / Dancing Links solver, extended with colored secondary
-    constraints.
+    GDance is a functional Rocq formalization of the generalized/colored
+    Dancing Links solver developed in this repository's [gdance.c].
+
+    The underlying algorithmic idea is Knuth-style Algorithm X / Dancing Links:
+    primary items are exact-cover obligations, secondary items are optional
+    constraints, and colored secondary items are handled by purification.  The
+    Rocq development preserves the terminology and structure used by [gdance.c],
+    including names such as [cover], [purify], [choose_col], [commit], [search],
+    and [solve].
+
+    The port is intentionally close to the original [gdance.c] design, but the
+    representation is changed to suit proof and extraction:
+
+    - C pointers, mutable circular lists, global arrays, and destructive updates
+      are replaced by immutable records and lists;
+    - destructive cover/uncover and purify/unpurify operations are replaced by
+      construction of residual problems;
+    - backtracking is expressed as structurally recursive search with an
+      explicit fuel parameter.
 
     The development is organized into four layers:
 
-    - A small generic data model for rows, columns, colored items, and problems.
-    - A purely functional solver based on [cover], [purify], [commit], and
-      recursive search.
-    - A soundness proof showing that every returned solution is valid for a
-      well-formed problem.
-    - Public problem-generator APIs for Sudoku-like problems, warehouse and
+    - a small generic data model for rows, columns, colored items, and problems;
+    - a purely functional solver based on [cover], [purify], [commit], and
+      recursive search;
+    - a soundness proof showing that every returned solution is valid for a
+      well-formed problem;
+    - public problem-generator APIs for Sudoku-like problems, warehouse and
       scheduling-style problems, combinatorics, N-Queens, Langford pairs, and
       van der Waerden-style generated colorings.
 
-    The extracted OCaml/Melange/JavaScript artifact is intended to power a
-    browser demo.  Large examples may exceed browser recursion or memory limits;
-    those are runtime limits of the JavaScript environment, not claims about the
-    mathematical solver specification.
+    The extracted OCaml/Melange/JavaScript artifact powers a browser demo.
+    Large examples may exceed browser recursion or memory limits; those are
+    JavaScript runtime limits, not claims about the mathematical solver
+    specification.
 
     The main exported guarantee is:
 
@@ -33,25 +49,10 @@
     Informally: every solution returned by [solve] is composed of problem rows,
     covers each primary item exactly once, and satisfies pairwise colored
     compatibility.
-*)
 
-(******************************************************************************
- * GDance.v
- *
- * A purely functional Rocq/Coq implementation of Knuth's generalized
- * Dancing Links idea (gdance):
- *
- *   - primary items are exact-cover obligations;
- *   - uncolored items are covered in the ordinary Algorithm X sense;
- *   - colored items are purified: rows with incompatible colors are removed,
- *     rows with the same color may coexist;
- *   - backtracking is ordinary structural recursion over immutable problems,
- *     so there is no explicit uncover/unpurify operation.
- *
- * This file intentionally keeps gdance-flavored names such as cover, purify,
- * choose_col, commit, search, and solve, while avoiding pointers, gotos,
- * global arrays, and destructive circular lists.
- ******************************************************************************)
+    This is a partial-correctness result.  Completeness and fuel adequacy are
+    separate properties and are not claimed by [solve_sound].
+*)
 
 From Stdlib Require Import List Bool Arith String.
 Import ListNotations.
