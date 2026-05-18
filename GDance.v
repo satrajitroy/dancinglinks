@@ -205,7 +205,6 @@ Module GDance.
     Notation RowT := (row Item Color RowId).
     Notation ProblemT := (problem Item Color RowId).
 
-
     Section Code.
 
       (** *** Executable definitions
@@ -213,6 +212,9 @@ Module GDance.
           The definitions in this subsection are computational and survive extraction.
           Proofs and propositions in later subsections are erased by extraction.
       *)
+
+      (* begin hide *)
+
 
       Definition row_eqb (r s : row Item Color RowId) : bool :=
         eqb (row_id r) (row_id s).
@@ -423,6 +425,8 @@ Module GDance.
         : list (list RowId) :=
         map solution_row_ids (solve fuel p).
 
+      (* end hide *)
+
     End Code.
 
     (******************************************************************************)
@@ -449,6 +453,8 @@ Module GDance.
 
           This predicate is the mathematical specification used by [solve_sound].
       *)
+
+      (* begin hide *)
 
       Definition rows_from_problem
         (p : problem Item Color RowId)
@@ -1746,6 +1752,8 @@ Module GDance.
                 -- exact Htail.
       Qed.
 
+      (* end hide *)
+
     End Proofs.
 
   End FunctionalGDance.
@@ -1945,6 +1953,8 @@ End GDance.
 *)
 
 Module SudokuProblem.
+  (* begin hide *)
+
   Import GDance.
 
   Inductive GCol :=
@@ -2170,15 +2180,17 @@ Module SudokuProblem.
     : list SRowId :=
     map row_id (generated_solution_rows R C r c sym_at).
 
-End SudokuProblem.
+    (* end hide *)
 
-From Stdlib Require Import List Arith Bool.
-Import ListNotations.
+End SudokuProblem.
 
 Module SudokuProblemExamples.
 
   Import GDance.
   Import SudokuProblem.
+
+  (* begin hide *)
+
 
   (******************************************************************************)
   (* 1. generalized_sudoku_problem_at_most                                       *)
@@ -2433,10 +2445,12 @@ Module SudokuProblemExamples.
     vm_compute.
     reflexivity.
   Qed.
+
+  (* end hide *)
+
 End SudokuProblemExamples.
 
 From Stdlib Require Import List String Ascii Arith Bool.
-Import ListNotations.
 Open Scope string_scope.
 
 (** ** Generated warehouse / scheduling-style problems
@@ -2459,6 +2473,8 @@ Open Scope string_scope.
 Module Guaranteed_K_Warehouse.
 
   Import GDance.
+
+  (* begin hide *)
 
   (******************************************************************************)
   (* Basic string/name generation                                                *)
@@ -2718,12 +2734,16 @@ Module Guaranteed_K_Warehouse.
       (guaranteed_k_colored_rows
         items sources product_colors source_reqs k).
 
+  (* end hide *)
+
 End Guaranteed_K_Warehouse.
 
 Module Guaranteed_K_WarehouseExamples.
 
   Import Guaranteed_K_Warehouse.
   Import GDance.
+
+  (* begin hide *)
 
   (******************************************************************************)
   (* generated_colored_problem                                                   *)
@@ -2871,9 +2891,11 @@ Module Guaranteed_K_WarehouseExamples.
     reflexivity.
   Qed.
 
+  (* end hide *)
+
 End Guaranteed_K_WarehouseExamples.
 
-From Stdlib Require Import List Arith Bool.
+(* From Stdlib Require Import List Arith Bool. *)
 Import ListNotations.
 
 (** ** Combinatorics problem generators
@@ -2904,6 +2926,9 @@ Import ListNotations.
 Module Combinatorics.
 
   Import GDance.
+
+  (* begin hide *)
+
 
   (******************************************************************************)
   (* Column universe                                                             *)
@@ -3411,6 +3436,9 @@ Module Combinatorics.
       (qrows n ++ qcols n)
       (queen_rows n).
 
+  (* end hide *)
+
+
   (** *** Langford pairs
 
       A Langford pairing of order [n] places two copies of each value [1..n] into
@@ -3445,6 +3473,8 @@ Module Combinatorics.
   (*                                                                            *)
   (* This chooses each number exactly once and fills every slot exactly once.     *)
   (******************************************************************************)
+
+  (* begin hide *)
 
   Definition langford_slots (n : nat) : list CCol :=
     List.map Slot (seq 0 (2 * n)).
@@ -3487,6 +3517,8 @@ Module Combinatorics.
       (langford_slots n ++ langford_values n)
       (langford_rows n).
 
+  (* end hide *)
+
   (** *** Van der Waerden-style generated colorings
 
       This API generates all [q]-colorings of [0..n-1], filters out those with a
@@ -3515,6 +3547,8 @@ Module Combinatorics.
   (* than a pairwise DLX constraint encoding, because "not all k positions are    *)
   (* the same color" is not naturally an at-most-one constraint when k >= 3.      *)
   (******************************************************************************)
+
+  (* begin hide *)
 
   Fixpoint colorings (n q : nat) : list (list nat) :=
     match n with
@@ -3628,12 +3662,16 @@ Module Combinatorics.
       [PickOne]
       (waerden_rows n q k).
 
+  (* end hide *)
+
 End Combinatorics.
 
 Module CombinatoricsGDanceExamples.
 
   Import Combinatorics.
   Import GDance.
+
+  (* begin hide *)
 
   (******************************************************************************)
   (* tuple_problem                                                               *)
@@ -4114,6 +4152,9 @@ Module CombinatoricsGDanceExamples.
     vm_compute.
     reflexivity.
   Qed.
+
+  (* end hide *)
+
 
 End CombinatoricsGDanceExamples.
 
