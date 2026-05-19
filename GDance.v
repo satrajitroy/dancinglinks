@@ -58,7 +58,7 @@ From Stdlib Require Import List Bool Arith String.
 Import ListNotations.
 Open Scope string_scope.
 
-Module GDance.
+Module Core.
 
   Set Implicit Arguments.
 
@@ -172,7 +172,7 @@ Module GDance.
 
   Section FunctionalGDance.
 
-    (** ** Functional Algorithm X / GDance solver
+    (** ** Functional Algorithm X / Core solver
 
         This section contains the executable solver.
 
@@ -1775,7 +1775,7 @@ Module GDance.
       problems directly from rows, primary items, colored items, and generated
       problem families.
 
-    Readers who want to build their own GDance problems should start here.
+    Readers who want to build their own Core problems should start here.
 *)
 
 Module Examples.
@@ -1936,7 +1936,7 @@ Module Examples.
 
 End Examples.
 
-End GDance.
+End Core.
 
 (** ** Sudoku-style problem generators
 
@@ -1971,7 +1971,7 @@ End GDance.
 Module SudokuProblem.
   (* begin hide *)
 
-  Import GDance.
+  Import Core.
 
   Inductive GCol :=
   | Cell   : nat -> nat -> GCol
@@ -2202,7 +2202,7 @@ End SudokuProblem.
 
 Module SudokuProblemExamples.
 
-  Import GDance.
+  Import Core.
   Import SudokuProblem.
 
   (* begin hide *)
@@ -2488,7 +2488,7 @@ Open Scope string_scope.
 
 Module Guaranteed_K_Warehouse.
 
-  Import GDance.
+  Import Core.
 
   (* begin hide *)
 
@@ -2547,7 +2547,7 @@ Module Guaranteed_K_Warehouse.
 
 
   (******************************************************************************)
-  (* GDance warehouse row model                                                  *)
+  (* Core warehouse row model                                                  *)
   (*                                                                            *)
   (* Item columns are primary and always uncolored.                              *)
   (* Source columns are secondary and may be uncolored or colored.               *)
@@ -2757,7 +2757,7 @@ End Guaranteed_K_Warehouse.
 Module Guaranteed_K_WarehouseExamples.
 
   Import Guaranteed_K_Warehouse.
-  Import GDance.
+  Import Core.
 
   (* begin hide *)
 
@@ -2871,7 +2871,7 @@ Module Guaranteed_K_WarehouseExamples.
   (******************************************************************************)
   (* guaranteed_k_colored_problem                                                *)
   (*                                                                            *)
-  (* Colored source columns use GDance/color purification semantics.              *)
+  (* Colored source columns use Core/color purification semantics.              *)
   (* Rows that share a source with the same source color may coexist.             *)
   (*                                                                            *)
   (* Parameters:                                                                 *)
@@ -2941,7 +2941,7 @@ Import ListNotations.
 
 Module Combinatorics.
 
-  Import GDance.
+  Import Core.
 
   (* begin hide *)
 
@@ -3560,8 +3560,8 @@ Module Combinatorics.
   (* AP-avoiding colorings.                                                       *)
   (*                                                                            *)
   (* Note: This is intentionally a "generated solution universe" encoding rather *)
-  (* than a pairwise DLX constraint encoding, because "not all k positions are    *)
-  (* the same color" is not naturally an at-most-one constraint when k >= 3.      *)
+  (* than a pairwise DLX constraint encoding, because "not all k positions are the same color" *)
+  (* is not naturally an at-most-one constraint when k >= 3.      *)
   (******************************************************************************)
 
   (* begin hide *)
@@ -3685,7 +3685,7 @@ End Combinatorics.
 Module CombinatoricsGDanceExamples.
 
   Import Combinatorics.
-  Import GDance.
+  Import Core.
 
   (* begin hide *)
 
@@ -4190,7 +4190,7 @@ End CombinatoricsGDanceExamples.
 
 Module PublicAPI.
 
-  Import GDance.
+  Import Core.
 
   (******************************************************************************)
   (* Specialized solve_ids wrappers                                              *)
@@ -4343,9 +4343,9 @@ Extraction "gdance.ml"
   PublicAPI.api_sudoku_at_most_ids
   PublicAPI.api_warehouse_guaranteed_ids
   PublicAPI.api_warehouse_guaranteed_colored_ids
-  (* GDance.solve 
-  GDance.solve_ids 
-  GDance.solution_row_ids 
+  (* Core.solve 
+  Core.solve_ids 
+  Core.solution_row_ids 
   SudokuProblem.generalized_sudoku_problem_at_most
   SudokuProblem.generalized_sudoku_problem_exact
   SudokuProblem.generalized_sudoku_problem_at_most_with_givens

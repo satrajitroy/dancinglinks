@@ -96,7 +96,7 @@ val eqb1 : string -> string -> bool
 
 val append : string -> string -> string
 
-module GDance :
+module Core :
  sig
   type 'a coq_Eqb =
     'a -> 'a -> bool
@@ -193,13 +193,13 @@ module SudokuProblem :
 
   val gcol_eqb : coq_GCol -> coq_GCol -> bool
 
-  val coq_Eqb_GCol : coq_GCol GDance.coq_Eqb
+  val coq_Eqb_GCol : coq_GCol Core.coq_Eqb
 
   type coq_SColor = nat
 
   type coq_SRowId = nat
 
-  val su : coq_GCol -> (coq_GCol, coq_SColor) GDance.citem
+  val su : coq_GCol -> (coq_GCol, coq_SColor) Core.citem
 
   val rows_count : nat -> nat -> nat
 
@@ -229,7 +229,7 @@ module SudokuProblem :
 
   val candidate_row :
     nat -> nat -> nat -> nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor,
-    coq_SRowId) GDance.row
+    coq_SRowId) Core.row
 
   val all_cells : nat -> nat -> nat -> nat -> coq_GCol list
 
@@ -242,16 +242,16 @@ module SudokuProblem :
   val all_sudoku_constraints : nat -> nat -> nat -> nat -> coq_GCol list
 
   val all_candidate_rows :
-    nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor, coq_SRowId) GDance.row
+    nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor, coq_SRowId) Core.row
     list
 
   val generalized_sudoku_problem_at_most :
     nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor, coq_SRowId)
-    GDance.problem
+    Core.problem
 
   val generalized_sudoku_problem_exact :
     nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor, coq_SRowId)
-    GDance.problem
+    Core.problem
  end
 
 module Guaranteed_K_Warehouse :
@@ -280,14 +280,14 @@ module Guaranteed_K_Warehouse :
 
   type coq_WRowId = nat
 
-  val primary_item_citem : string -> (coq_WItem, coq_WColor) GDance.citem
+  val primary_item_citem : string -> (coq_WItem, coq_WColor) Core.citem
 
   val secondary_source_citem :
-    string -> string option -> (coq_WItem, coq_WColor) GDance.citem
+    string -> string option -> (coq_WItem, coq_WColor) Core.citem
 
   val warehouse_row :
     coq_WRowId -> string -> string list -> string option -> string option ->
-    (coq_WItem, coq_WColor, coq_WRowId) GDance.row
+    (coq_WItem, coq_WColor, coq_WRowId) Core.row
 
   val assigned_items_for_source_shifted :
     string list -> nat -> nat -> nat -> string list
@@ -296,26 +296,26 @@ module Guaranteed_K_Warehouse :
 
   val guaranteed_rows_for_witness :
     string list -> string list -> nat -> (coq_WItem, coq_WColor, coq_WRowId)
-    GDance.row list
+    Core.row list
 
   val guaranteed_k_rows :
     string list -> string list -> nat -> (coq_WItem, coq_WColor, coq_WRowId)
-    GDance.row list
+    Core.row list
 
   val guaranteed_k_problem :
-    nat -> nat -> nat -> (coq_WItem, coq_WColor, coq_WRowId) GDance.problem
+    nat -> nat -> nat -> (coq_WItem, coq_WColor, coq_WRowId) Core.problem
 
   val guaranteed_rows_for_witness_colored :
     string list -> string list -> string list -> string list -> nat ->
-    (coq_WItem, coq_WColor, coq_WRowId) GDance.row list
+    (coq_WItem, coq_WColor, coq_WRowId) Core.row list
 
   val guaranteed_k_colored_rows :
     string list -> string list -> string list -> string list -> nat ->
-    (coq_WItem, coq_WColor, coq_WRowId) GDance.row list
+    (coq_WItem, coq_WColor, coq_WRowId) Core.row list
 
   val guaranteed_k_colored_problem :
     nat -> nat -> nat -> nat -> nat -> (coq_WItem, coq_WColor, coq_WRowId)
-    GDance.problem
+    Core.problem
  end
 
 module Combinatorics :
@@ -333,21 +333,20 @@ module Combinatorics :
 
   val ccol_eqb : coq_CCol -> coq_CCol -> bool
 
-  val coq_Eqb_CCol : coq_CCol GDance.coq_Eqb
+  val coq_Eqb_CCol : coq_CCol Core.coq_Eqb
 
   type coq_CColor = nat
 
   type coq_CRowId = nat
 
-  val item : coq_CCol -> (coq_CCol, coq_CColor) GDance.citem
+  val item : coq_CCol -> (coq_CCol, coq_CColor) Core.citem
 
   val make_row :
-    coq_CRowId -> coq_CCol list -> (coq_CCol, coq_CColor, coq_CRowId)
-    GDance.row
+    coq_CRowId -> coq_CCol list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val make_problem :
-    coq_CCol list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list ->
-    (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    coq_CCol list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list ->
+    (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val slots : nat -> coq_CCol list
 
@@ -356,22 +355,22 @@ module Combinatorics :
   val assignment_id : nat -> nat -> nat -> coq_CRowId
 
   val tuple_row :
-    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val assignment_rows_tuple :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list
 
   val tuple_problem :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val permutation_row :
-    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val assignment_rows_permutation :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list
 
   val permutation_problem :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val combinations_from : nat -> nat -> nat -> nat list list
 
@@ -380,12 +379,12 @@ module Combinatorics :
   val combination_cols_aux : nat -> nat list -> coq_CCol list
 
   val combination_row :
-    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val indexed : 'a1 list -> (nat, 'a1) prod list
 
   val combination_problem :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val sum_nat : nat list -> nat
 
@@ -402,10 +401,10 @@ module Combinatorics :
   val partition_cols_aux : nat -> nat list -> coq_CCol list
 
   val partition_row :
-    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val partition_problem :
-    nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val has_k_parts : nat -> nat list -> bool
 
@@ -414,59 +413,59 @@ module Combinatorics :
   val partitions_of_k : nat -> nat -> nat list list
 
   val partition_problem_k :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val subsets : nat list -> nat list list
 
   val nonempty_subsets : nat list -> nat list list
 
   val set_partition_row :
-    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val generated_set : nat -> nat list
 
   val set_partition_problem_values :
-    nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val set_partition_problem_generated :
-    nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val set_partition_k_row :
     nat -> nat -> nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId)
-    GDance.row
+    Core.row
 
   val set_partition_k_rows_values :
-    nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list
+    nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list
 
   val set_partition_k_problem_values :
-    nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val set_partition_k_problem_generated :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val multiset_partition_row :
-    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val generated_multiset : nat -> nat -> nat list
 
   val multiset_partition_problem :
-    nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val multiset_partition_problem_generated :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val multiset_partition_k_row :
     nat -> nat -> nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId)
-    GDance.row
+    Core.row
 
   val multiset_partition_k_rows :
-    nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list
+    nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list
 
   val multiset_partition_k_problem :
-    nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val multiset_partition_k_problem_generated :
-    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val diag1 : nat -> nat -> nat
 
@@ -475,16 +474,15 @@ module Combinatorics :
   val queen_id : nat -> nat -> nat -> coq_CRowId
 
   val queen_row :
-    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
-  val queen_rows : nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list
+  val queen_rows : nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list
 
   val qrows : nat -> coq_CCol list
 
   val qcols : nat -> coq_CCol list
 
-  val nqueens_problem :
-    nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+  val nqueens_problem : nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val langford_slots : nat -> coq_CCol list
 
@@ -497,16 +495,15 @@ module Combinatorics :
   val langford_start_count : nat -> nat -> nat
 
   val langford_row :
-    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val langford_rows_for_value :
-    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list
+    nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list
 
-  val langford_rows :
-    nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list
+  val langford_rows : nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list
 
   val langford_problem :
-    nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
 
   val colorings : nat -> nat -> nat list list
 
@@ -531,31 +528,31 @@ module Combinatorics :
   val coloring_cols_aux : nat -> nat list -> coq_CCol list
 
   val waerden_coloring_row :
-    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row
+    coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row
 
   val waerden_rows :
-    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list
+    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list
 
   val waerden_problem :
-    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem
+    nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem
  end
 
 module PublicAPI :
  sig
   val solve_ids_combinatorics :
     nat -> (Combinatorics.coq_CCol, Combinatorics.coq_CColor,
-    Combinatorics.coq_CRowId) GDance.problem -> Combinatorics.coq_CRowId list
+    Combinatorics.coq_CRowId) Core.problem -> Combinatorics.coq_CRowId list
     list
 
   val solve_ids_sudoku :
     nat -> (SudokuProblem.coq_GCol, SudokuProblem.coq_SColor,
-    SudokuProblem.coq_SRowId) GDance.problem -> SudokuProblem.coq_SRowId list
+    SudokuProblem.coq_SRowId) Core.problem -> SudokuProblem.coq_SRowId list
     list
 
   val solve_ids_warehouse :
     nat -> (Guaranteed_K_Warehouse.coq_WItem,
     Guaranteed_K_Warehouse.coq_WColor, Guaranteed_K_Warehouse.coq_WRowId)
-    GDance.problem -> Guaranteed_K_Warehouse.coq_WRowId list list
+    Core.problem -> Guaranteed_K_Warehouse.coq_WRowId list list
 
   val api_nqueens_ids : nat -> nat -> nat list list
 

@@ -302,7 +302,7 @@ let rec append s1 s2 =
   | EmptyString -> s2
   | String (c, s1') -> String (c, (append s1' s2))
 
-module GDance =
+module Core =
  struct
   type 'a coq_Eqb =
     'a -> 'a -> bool
@@ -544,7 +544,7 @@ module SudokuProblem =
           | False -> False)
        | _ -> False)
 
-  (** val coq_Eqb_GCol : coq_GCol GDance.coq_Eqb **)
+  (** val coq_Eqb_GCol : coq_GCol Core.coq_Eqb **)
 
   let coq_Eqb_GCol =
     gcol_eqb
@@ -553,10 +553,10 @@ module SudokuProblem =
 
   type coq_SRowId = nat
 
-  (** val su : coq_GCol -> (coq_GCol, coq_SColor) GDance.citem **)
+  (** val su : coq_GCol -> (coq_GCol, coq_SColor) Core.citem **)
 
   let su x =
-    { GDance.ci_col = x; GDance.ci_color = None }
+    { Core.ci_col = x; Core.ci_color = None }
 
   (** val rows_count : nat -> nat -> nat **)
 
@@ -626,11 +626,11 @@ module SudokuProblem =
 
   (** val candidate_row :
       nat -> nat -> nat -> nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor,
-      coq_SRowId) GDance.row **)
+      coq_SRowId) Core.row **)
 
   let candidate_row r c r0 c0 row_ix col_ix sym =
-    { GDance.row_id = (candidate_id r c r0 c0 row_ix col_ix sym);
-      GDance.row_items =
+    { Core.row_id = (candidate_id r c r0 c0 row_ix col_ix sym);
+      Core.row_items =
       (map su (candidate_items r c r0 c0 row_ix col_ix sym)) }
 
   (** val all_cells : nat -> nat -> nat -> nat -> coq_GCol list **)
@@ -674,8 +674,8 @@ module SudokuProblem =
           (all_box_symbol_constraints r c r0 c0)))
 
   (** val all_candidate_rows :
-      nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor, coq_SRowId)
-      GDance.row list **)
+      nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor, coq_SRowId) Core.row
+      list **)
 
   let all_candidate_rows r c r0 c0 =
     flat_map (fun row0 ->
@@ -687,19 +687,19 @@ module SudokuProblem =
 
   (** val generalized_sudoku_problem_at_most :
       nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor, coq_SRowId)
-      GDance.problem **)
+      Core.problem **)
 
   let generalized_sudoku_problem_at_most r c r0 c0 =
-    { GDance.primary_items = (all_cells r c r0 c0); GDance.rows =
+    { Core.primary_items = (all_cells r c r0 c0); Core.rows =
       (all_candidate_rows r c r0 c0) }
 
   (** val generalized_sudoku_problem_exact :
       nat -> nat -> nat -> nat -> (coq_GCol, coq_SColor, coq_SRowId)
-      GDance.problem **)
+      Core.problem **)
 
   let generalized_sudoku_problem_exact r c r0 c0 =
-    { GDance.primary_items = (all_sudoku_constraints r c r0 c0);
-      GDance.rows = (all_candidate_rows r c r0 c0) }
+    { Core.primary_items = (all_sudoku_constraints r c r0 c0); Core.rows =
+      (all_candidate_rows r c r0 c0) }
  end
 
 module Guaranteed_K_Warehouse =
@@ -803,23 +803,23 @@ module Guaranteed_K_Warehouse =
   type coq_WRowId = nat
 
   (** val primary_item_citem :
-      string -> (coq_WItem, coq_WColor) GDance.citem **)
+      string -> (coq_WItem, coq_WColor) Core.citem **)
 
   let primary_item_citem item0 =
-    { GDance.ci_col = item0; GDance.ci_color = None }
+    { Core.ci_col = item0; Core.ci_color = None }
 
   (** val secondary_source_citem :
-      string -> string option -> (coq_WItem, coq_WColor) GDance.citem **)
+      string -> string option -> (coq_WItem, coq_WColor) Core.citem **)
 
   let secondary_source_citem src source_color =
-    { GDance.ci_col = src; GDance.ci_color = source_color }
+    { Core.ci_col = src; Core.ci_color = source_color }
 
   (** val warehouse_row :
       coq_WRowId -> string -> string list -> string option -> string option
-      -> (coq_WItem, coq_WColor, coq_WRowId) GDance.row **)
+      -> (coq_WItem, coq_WColor, coq_WRowId) Core.row **)
 
   let warehouse_row id src items _ source_color =
-    { GDance.row_id = id; GDance.row_items =
+    { Core.row_id = id; Core.row_items =
       (app (map primary_item_citem items) (Cons
         ((secondary_source_citem src source_color), Nil))) }
 
@@ -840,7 +840,7 @@ module Guaranteed_K_Warehouse =
 
   (** val guaranteed_rows_for_witness :
       string list -> string list -> nat -> (coq_WItem, coq_WColor,
-      coq_WRowId) GDance.row list **)
+      coq_WRowId) Core.row list **)
 
   let guaranteed_rows_for_witness items sources witness_id =
     map (fun pat ->
@@ -853,14 +853,14 @@ module Guaranteed_K_Warehouse =
 
   (** val guaranteed_k_rows :
       string list -> string list -> nat -> (coq_WItem, coq_WColor,
-      coq_WRowId) GDance.row list **)
+      coq_WRowId) Core.row list **)
 
   let guaranteed_k_rows items sources k =
     flat_map (fun witness_id ->
       guaranteed_rows_for_witness items sources witness_id) (seq O k)
 
   (** val guaranteed_k_problem :
-      nat -> nat -> nat -> (coq_WItem, coq_WColor, coq_WRowId) GDance.problem **)
+      nat -> nat -> nat -> (coq_WItem, coq_WColor, coq_WRowId) Core.problem **)
 
   let guaranteed_k_problem n_items n_sources k =
     let items =
@@ -876,12 +876,12 @@ module Guaranteed_K_Warehouse =
         True, True, False)), (String ((Ascii (True, True, False, False,
         False, True, True, False)), EmptyString)))))) n_sources
     in
-    { GDance.primary_items = items; GDance.rows =
+    { Core.primary_items = items; Core.rows =
     (guaranteed_k_rows items sources k) }
 
   (** val guaranteed_rows_for_witness_colored :
       string list -> string list -> string list -> string list -> nat ->
-      (coq_WItem, coq_WColor, coq_WRowId) GDance.row list **)
+      (coq_WItem, coq_WColor, coq_WRowId) Core.row list **)
 
   let guaranteed_rows_for_witness_colored items sources product_colors source_reqs witness_id =
     map (fun pat ->
@@ -896,7 +896,7 @@ module Guaranteed_K_Warehouse =
 
   (** val guaranteed_k_colored_rows :
       string list -> string list -> string list -> string list -> nat ->
-      (coq_WItem, coq_WColor, coq_WRowId) GDance.row list **)
+      (coq_WItem, coq_WColor, coq_WRowId) Core.row list **)
 
   let guaranteed_k_colored_rows items sources product_colors source_reqs k =
     flat_map (fun witness_id ->
@@ -906,7 +906,7 @@ module Guaranteed_K_Warehouse =
 
   (** val guaranteed_k_colored_problem :
       nat -> nat -> nat -> nat -> nat -> (coq_WItem, coq_WColor, coq_WRowId)
-      GDance.problem **)
+      Core.problem **)
 
   let guaranteed_k_colored_problem n_items n_sources n_product_colors n_source_reqs k =
     let items =
@@ -936,7 +936,7 @@ module Guaranteed_K_Warehouse =
         True, True, False)), (String ((Ascii (True, False, False, False,
         True, True, True, False)), EmptyString)))))) n_source_reqs
     in
-    { GDance.primary_items = items; GDance.rows =
+    { Core.primary_items = items; Core.rows =
     (guaranteed_k_colored_rows items sources product_colors source_reqs k) }
  end
 
@@ -989,7 +989,7 @@ module Combinatorics =
                    | QDiag2 j -> Nat.eqb i j
                    | _ -> False)
 
-  (** val coq_Eqb_CCol : coq_CCol GDance.coq_Eqb **)
+  (** val coq_Eqb_CCol : coq_CCol Core.coq_Eqb **)
 
   let coq_Eqb_CCol =
     ccol_eqb
@@ -998,24 +998,24 @@ module Combinatorics =
 
   type coq_CRowId = nat
 
-  (** val item : coq_CCol -> (coq_CCol, coq_CColor) GDance.citem **)
+  (** val item : coq_CCol -> (coq_CCol, coq_CColor) Core.citem **)
 
   let item c =
-    { GDance.ci_col = c; GDance.ci_color = None }
+    { Core.ci_col = c; Core.ci_color = None }
 
   (** val make_row :
       coq_CRowId -> coq_CCol list -> (coq_CCol, coq_CColor, coq_CRowId)
-      GDance.row **)
+      Core.row **)
 
   let make_row id cols =
-    { GDance.row_id = id; GDance.row_items = (map item cols) }
+    { Core.row_id = id; Core.row_items = (map item cols) }
 
   (** val make_problem :
-      coq_CCol list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list ->
-      (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      coq_CCol list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list ->
+      (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let make_problem primary rows0 =
-    { GDance.primary_items = primary; GDance.rows = rows0 }
+    { Core.primary_items = primary; Core.rows = rows0 }
 
   (** val slots : nat -> coq_CCol list **)
 
@@ -1033,39 +1033,39 @@ module Combinatorics =
     add (mul slot n) value
 
   (** val tuple_row :
-      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let tuple_row n slot value =
     make_row (assignment_id n slot value) (Cons ((Slot slot), Nil))
 
   (** val assignment_rows_tuple :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list **)
 
   let assignment_rows_tuple k n =
     flat_map (fun s -> map (fun v -> tuple_row n s v) (seq O n)) (seq O k)
 
   (** val tuple_problem :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let tuple_problem k n =
     make_problem (slots k) (assignment_rows_tuple k n)
 
   (** val permutation_row :
-      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let permutation_row n slot value =
     make_row (assignment_id n slot value) (Cons ((Slot slot), (Cons ((Value
       value), Nil))))
 
   (** val assignment_rows_permutation :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list **)
 
   let assignment_rows_permutation k n =
     flat_map (fun s -> map (fun v -> permutation_row n s v) (seq O n))
       (seq O k)
 
   (** val permutation_problem :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let permutation_problem k n =
     make_problem (slots k) (assignment_rows_permutation k n)
@@ -1094,7 +1094,7 @@ module Combinatorics =
       (combination_cols_aux (S slot) xs'))))
 
   (** val combination_row :
-      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let combination_row id xs =
     make_row id (Cons (PickOne, (combination_cols_aux O xs)))
@@ -1105,7 +1105,7 @@ module Combinatorics =
     combine (seq O (length xs)) xs
 
   (** val combination_problem :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let combination_problem k n =
     make_problem (Cons (PickOne, Nil))
@@ -1166,13 +1166,13 @@ module Combinatorics =
   | Cons (x, xs') -> Cons ((PartAt (i, x)), (partition_cols_aux (S i) xs'))
 
   (** val partition_row :
-      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let partition_row id xs =
     make_row id (Cons (PickOne, (partition_cols_aux O xs)))
 
   (** val partition_problem :
-      nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let partition_problem n =
     make_problem (Cons (PickOne, Nil))
@@ -1197,7 +1197,7 @@ module Combinatorics =
     filter (is_partition_of_k n k) (partitions_bounded (S n) n n)
 
   (** val partition_problem_k :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let partition_problem_k n k =
     make_problem (Cons (PickOne, Nil))
@@ -1217,7 +1217,7 @@ module Combinatorics =
     filter (fun s -> negb (Nat.eqb (length s) O)) (subsets xs)
 
   (** val set_partition_row :
-      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let set_partition_row id xs =
     make_row id (map (fun x -> Value x) xs)
@@ -1228,7 +1228,7 @@ module Combinatorics =
     seq O n
 
   (** val set_partition_problem_values :
-      nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let set_partition_problem_values elems =
     make_problem (map (fun x -> Value x) elems)
@@ -1236,21 +1236,21 @@ module Combinatorics =
         (indexed (nonempty_subsets elems)))
 
   (** val set_partition_problem_generated :
-      nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let set_partition_problem_generated n =
     set_partition_problem_values (generated_set n)
 
   (** val set_partition_k_row :
       nat -> nat -> nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId)
-      GDance.row **)
+      Core.row **)
 
   let set_partition_k_row n slot block_id xs =
     make_row (add (mul slot (Nat.pow (S (S O)) n)) block_id) (Cons ((Slot
       slot), (map (fun x -> Value x) xs)))
 
   (** val set_partition_k_rows_values :
-      nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list **)
+      nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list **)
 
   let set_partition_k_rows_values k elems =
     let n = length elems in
@@ -1261,20 +1261,20 @@ module Combinatorics =
       (seq O k)
 
   (** val set_partition_k_problem_values :
-      nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let set_partition_k_problem_values k elems =
     make_problem (app (slots k) (map (fun x -> Value x) elems))
       (set_partition_k_rows_values k elems)
 
   (** val set_partition_k_problem_generated :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let set_partition_k_problem_generated k n =
     set_partition_k_problem_values k (generated_set n)
 
   (** val multiset_partition_row :
-      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let multiset_partition_row id xs =
     make_row id (map (fun x -> Occur x) xs)
@@ -1286,7 +1286,7 @@ module Combinatorics =
   | S _ -> map (fun i -> Nat.modulo i label_count) (seq O n)
 
   (** val multiset_partition_problem :
-      nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let multiset_partition_problem values0 =
     let n = length values0 in
@@ -1297,21 +1297,21 @@ module Combinatorics =
         (indexed (nonempty_subsets occs)))
 
   (** val multiset_partition_problem_generated :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let multiset_partition_problem_generated n label_count =
     multiset_partition_problem (generated_multiset n label_count)
 
   (** val multiset_partition_k_row :
       nat -> nat -> nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId)
-      GDance.row **)
+      Core.row **)
 
   let multiset_partition_k_row n slot block_id xs =
     make_row (add (mul slot (Nat.pow (S (S O)) n)) block_id) (Cons ((Slot
       slot), (map (fun x -> Occur x) xs)))
 
   (** val multiset_partition_k_rows :
-      nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list **)
+      nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list **)
 
   let multiset_partition_k_rows k values0 =
     let n = length values0 in
@@ -1323,7 +1323,7 @@ module Combinatorics =
       (seq O k)
 
   (** val multiset_partition_k_problem :
-      nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let multiset_partition_k_problem k values0 =
     let n = length values0 in
@@ -1331,7 +1331,7 @@ module Combinatorics =
       (multiset_partition_k_rows k values0)
 
   (** val multiset_partition_k_problem_generated :
-      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let multiset_partition_k_problem_generated k n label_count =
     multiset_partition_k_problem k (generated_multiset n label_count)
@@ -1352,14 +1352,14 @@ module Combinatorics =
     add (mul r n) c
 
   (** val queen_row :
-      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let queen_row n r c =
     make_row (queen_id n r c) (Cons ((QRow r), (Cons ((QCol c), (Cons
       ((QDiag1 (diag1 r c)), (Cons ((QDiag2 (diag2 n r c)), Nil))))))))
 
   (** val queen_rows :
-      nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list **)
+      nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list **)
 
   let queen_rows n =
     flat_map (fun r -> map (fun c -> queen_row n r c) (seq O n)) (seq O n)
@@ -1375,7 +1375,7 @@ module Combinatorics =
     map (fun x -> QCol x) (seq O n)
 
   (** val nqueens_problem :
-      nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let nqueens_problem n =
     make_problem (app (qrows n) (qcols n)) (queen_rows n)
@@ -1406,27 +1406,27 @@ module Combinatorics =
     sub (sub (mul (S (S O)) n) k) (S O)
 
   (** val langford_row :
-      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let langford_row n k start =
     make_row (langford_row_id n k start) (Cons ((Slot start), (Cons ((Slot
       (langford_second_pos k start)), (Cons ((Value k), Nil))))))
 
   (** val langford_rows_for_value :
-      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list **)
+      nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list **)
 
   let langford_rows_for_value n k =
     map (fun start -> langford_row n k start)
       (seq O (langford_start_count n k))
 
   (** val langford_rows :
-      nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list **)
+      nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list **)
 
   let langford_rows n =
     flat_map (fun k -> langford_rows_for_value n k) (seq (S O) n)
 
   (** val langford_problem :
-      nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let langford_problem n =
     make_problem (app (langford_slots n) (langford_values n))
@@ -1505,13 +1505,13 @@ module Combinatorics =
     Cons ((PartAt (pos, color)), (coloring_cols_aux (S pos) colors'))
 
   (** val waerden_coloring_row :
-      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row **)
+      coq_CRowId -> nat list -> (coq_CCol, coq_CColor, coq_CRowId) Core.row **)
 
   let waerden_coloring_row id colors =
     make_row id (Cons (PickOne, (coloring_cols_aux O colors)))
 
   (** val waerden_rows :
-      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.row list **)
+      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.row list **)
 
   let waerden_rows n q k =
     map (fun pat ->
@@ -1519,7 +1519,7 @@ module Combinatorics =
       (indexed (waerden_good_colorings n q k))
 
   (** val waerden_problem :
-      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) GDance.problem **)
+      nat -> nat -> nat -> (coq_CCol, coq_CColor, coq_CRowId) Core.problem **)
 
   let waerden_problem n q k =
     make_problem (Cons (PickOne, Nil)) (waerden_rows n q k)
@@ -1529,27 +1529,27 @@ module PublicAPI =
  struct
   (** val solve_ids_combinatorics :
       nat -> (Combinatorics.coq_CCol, Combinatorics.coq_CColor,
-      Combinatorics.coq_CRowId) GDance.problem -> Combinatorics.coq_CRowId
-      list list **)
+      Combinatorics.coq_CRowId) Core.problem -> Combinatorics.coq_CRowId list
+      list **)
 
   let solve_ids_combinatorics fuel p =
-    GDance.solve_ids Combinatorics.coq_Eqb_CCol GDance.coq_Eqb_nat fuel p
+    Core.solve_ids Combinatorics.coq_Eqb_CCol Core.coq_Eqb_nat fuel p
 
   (** val solve_ids_sudoku :
       nat -> (SudokuProblem.coq_GCol, SudokuProblem.coq_SColor,
-      SudokuProblem.coq_SRowId) GDance.problem -> SudokuProblem.coq_SRowId
-      list list **)
+      SudokuProblem.coq_SRowId) Core.problem -> SudokuProblem.coq_SRowId list
+      list **)
 
   let solve_ids_sudoku fuel p =
-    GDance.solve_ids SudokuProblem.coq_Eqb_GCol GDance.coq_Eqb_nat fuel p
+    Core.solve_ids SudokuProblem.coq_Eqb_GCol Core.coq_Eqb_nat fuel p
 
   (** val solve_ids_warehouse :
       nat -> (Guaranteed_K_Warehouse.coq_WItem,
       Guaranteed_K_Warehouse.coq_WColor, Guaranteed_K_Warehouse.coq_WRowId)
-      GDance.problem -> Guaranteed_K_Warehouse.coq_WRowId list list **)
+      Core.problem -> Guaranteed_K_Warehouse.coq_WRowId list list **)
 
   let solve_ids_warehouse fuel p =
-    GDance.solve_ids GDance.coq_Eqb_string GDance.coq_Eqb_string fuel p
+    Core.solve_ids Core.coq_Eqb_string Core.coq_Eqb_string fuel p
 
   (** val api_nqueens_ids : nat -> nat -> nat list list **)
 

@@ -659,7 +659,7 @@ function solve_ids(h, h0, fuel, p) {
   return map(solution_row_ids, search(h, h0, fuel, p));
 }
 
-const GDance = {
+const Core = {
   eqb: eqb$2,
   coq_Eqb_nat: eqb$1,
   coq_Eqb_string: eqb1,
@@ -2750,7 +2750,7 @@ export {
   eqb0,
   eqb1,
   append,
-  GDance,
+  Core,
   SudokuProblem,
   Guaranteed_K_Warehouse,
   Combinatorics,
