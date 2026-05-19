@@ -1788,13 +1788,48 @@ Module Examples.
 
   Definition k (i : I) (c : C) : citem I C := CItem i (Some c).
 
-  (*
-    Primaries: A, B
-    Secondary colored item: X
+  (** *** Minimal colored-constraint example
 
-    Rows 1 and 2 share X with the same color and therefore may coexist.
-    Row 3 shares X with a different color and is incompatible with either.
+      This example demonstrates the smallest useful colored-DLX behavior.
+
+      We use:
+
+      - [I := string] for item/column names;
+      - [C := nat] for colors;
+      - [R := nat] for row identifiers.
+
+      The helper [u] creates an uncolored item occurrence.  In this problem,
+      uncolored primary items must be covered exactly once.
+
+      The helper [k] creates a colored item occurrence.  Colored occurrences of
+      the same item are compatible only when their colors agree.
+
+      The problem has primary items [A] and [B]:
+
+      - [r1] has row id [1] and covers primary item [A], with colored item
+        [X] at color [7].
+      - [r2] has row id [2] and covers primary item [B], with colored item
+        [X] at color [7].
+      - [r3] has row id [3] and covers primary item [B], with colored item
+        [X] at color [9].
+
+      Since [A] appears only in [r1], every valid solution must choose [r1].
+
+      To cover [B], the solver may try [r2] or [r3].  However:
+
+      - [r1] and [r2] are compatible because they both use colored item [X]
+        with color [7].
+      - [r1] and [r3] are incompatible because they use the same colored item
+        [X] with different colors, [7] and [9].
+
+      Therefore the only valid solution is the pair of row identifiers
+      [[1; 2]].
+
+      The expected result has type [list (list R)] because [solve_ids] returns
+      all solutions, and each solution is represented as a list of selected row
+      identifiers.
   *)
+
   Definition r1 : row I C R := Row 1 [u "A"; k "X" 7].
   Definition r2 : row I C R := Row 2 [u "B"; k "X" 7].
   Definition r3 : row I C R := Row 3 [u "B"; k "X" 9].
@@ -1805,7 +1840,46 @@ Module Examples.
   Program Definition solve_correct : solve_ids 5 demo_problem =demo_expected := _.
 
 
-  (* Expected shape: [[1; 2]], up to row ordering determined by choose_col/search. *)
+ (** *** Two independent color chains
+
+      This example extends the minimal colored example to three primary items:
+      [A], [B], and [C].
+
+      The rows are arranged into two compatible chains.
+
+      First chain:
+
+      - [R1] covers [A] and assigns [X] color [7].
+      - [R2] covers [B] and also uses [X] color [7], so it is compatible
+        with [R1].  It additionally assigns [Y] color [1].
+      - [R4] covers [C] and uses [Y] color [1], so it is compatible with [R2].
+
+      Therefore [R1; R2; R4] is a valid solution.
+
+      Second chain:
+
+      - [R6] covers [A] and assigns [X] color [9].
+      - [R3] covers [B] and also uses [X] color [9], so it is compatible
+        with [R6].  It additionally assigns [Y] color [2].
+      - [R5] covers [C] and uses [Y] color [2], so it is compatible with [R3].
+
+      Therefore [R6; R3; R5] is also a valid solution.
+
+      Mixed chains are rejected by color incompatibility.  For example,
+      [R1] cannot be combined with [R3], because both mention [X] but with
+      different colors [7] and [9].  Similarly, [R2] cannot be combined with
+      [R5], because both mention [Y] but with different colors [1] and [2].
+
+      Hence the expected solutions are exactly:
+
+      [[
+        [1; 2; 4];
+        [6; 3; 5]
+      ]]
+
+      The order of solutions follows the deterministic branch order used by
+      [choose_col] and [search].
+  *)
 
   Definition R1 : row I C R := Row 1 [u "A"; k "X" 7].
   Definition R6 : row I C R := Row 6 [u "A"; k "X" 9].
@@ -1821,6 +1895,58 @@ Module Examples.
 
   Definition demo_solutions_2 : list (list R) := solve_ids 10 demo_problem_2.
   Program Definition sol_correct: solve_ids 10 demo_problem_2 = [[1; 2; 4]; [6; 3; 5]] := _.
+
+  (** *** Longer color-propagation chain
+
+      This example scales the same idea to six primary items:
+
+      [[
+        A, B, C, D, E, F
+      ]]
+
+      There are four possible color tracks.  Each valid solution must choose one
+      row covering each primary item, but the colored secondary items force the
+      choices to remain on a single compatible track.
+
+      Track 1:
+
+      - [R101] covers [A] and sets [X = 1].
+      - [R201] covers [B], requires [X = 1], and sets [Y = 10].
+      - [R301] covers [C], requires [Y = 10], and sets [Z = 100].
+      - [R401] covers [D], requires [Z = 100], and sets [W = 5].
+      - [R501] covers [E], requires [W = 5], and sets [V = 11].
+      - [R601] covers [F] and requires [V = 11].
+
+      Thus the first solution is:
+
+      [[
+        [101; 201; 301; 401; 501; 601]
+      ]]
+
+      The other three tracks are analogous:
+
+      - track 2 uses colors [X = 2], [Y = 20], [Z = 200], [W = 6], [V = 12];
+      - track 3 uses colors [X = 3], [Y = 30], [Z = 300], [W = 7], [V = 13];
+      - track 4 uses colors [X = 4], [Y = 40], [Z = 400], [W = 8], [V = 14].
+
+      Any attempt to switch tracks is rejected by colored compatibility.  For
+      example, choosing [R101] forces [X = 1], so the [B]-row must be [R201].
+      Choosing [R202], [R203], or [R204] would conflict on [X].  Then [R201]
+      forces [Y = 10], so the [C]-row must be [R301], and so on.
+
+      Therefore the only valid solutions are the four complete tracks:
+
+      [[
+        [101; 201; 301; 401; 501; 601];
+        [102; 202; 302; 402; 502; 602];
+        [103; 203; 303; 403; 503; 603];
+        [104; 204; 304; 404; 504; 604]
+      ]]
+
+      This example is useful because it shows colored secondary items behaving
+      like deterministic compatibility links across a longer chain of primary
+      choices.
+  *)
 
   Definition R101 : row I C R := Row 101 [u "A"; k "X" 1].
   Definition R102 : row I C R := Row 102 [u "A"; k "X" 2].
@@ -1870,6 +1996,95 @@ Module Examples.
       [102; 202; 302; 402; 502; 602];
       [103; 203; 303; 403; 503; 603];
       [104; 204; 304; 404; 504; 604]] := _.
+
+  (** *** Multiset partition as exact cover over occurrences
+
+      This example shows how a multiset partition can be modeled as an exact-cover
+      problem.
+
+      The important modeling trick is that repeated multiset elements are first
+      expanded into distinct _occurrences_.
+
+      Here the multiset is:
+
+      [[
+        {0, 0, 1, 1, 2}
+      ]]
+
+      We represent its five occurrences as primary items:
+
+      - [M00 = (0,0)] : first occurrence of element [0];
+      - [M01 = (0,1)] : second occurrence of element [0];
+      - [M10 = (1,0)] : first occurrence of element [1];
+      - [M11 = (1,1)] : second occurrence of element [1];
+      - [M20 = (2,0)] : only occurrence of element [2].
+
+      A candidate row represents one possible block of the partition.  For
+      example:
+
+      - [P1] has row id [1] and represents the block [[M00; M10]],
+        mathematically corresponding to one [0] and one [1].
+      - [P2] has row id [2] and represents the block [[M01; M11]],
+        again corresponding to one [0] and one [1].
+      - [P3] has row id [3] and represents the singleton block [[M20]].
+      - [P4] and [P5] represent the crossed pairing
+        [[M00; M11]] and [[M01; M10]].
+      - [P6], [P7], [P8], [P9], and [P10] are singleton occurrence blocks.
+
+      The exact-cover requirement says that every occurrence [M00], [M01],
+      [M10], [M11], and [M20] must be covered exactly once.  Therefore a solver
+      result is a list of row identifiers naming candidate blocks, not a list of
+      multiset elements.
+
+      For example, the solution
+
+      [[
+        [3; 1; 2]
+      ]]
+
+      means:
+
+      - choose [P3] = [[M20]];
+      - choose [P1] = [[M00; M10]];
+      - choose [P2] = [[M01; M11]].
+
+      Decoded mathematically, this is the partition:
+
+      [[
+        {{2}, {0,1}, {0,1}}
+      ]]
+
+      Another solution,
+
+      [[
+        [3; 4; 5]
+      ]]
+
+      means:
+
+      - choose [P3] = [[M20]];
+      - choose [P4] = [[M00; M11]];
+      - choose [P5] = [[M01; M10]].
+
+      This is the crossed occurrence-level pairing.  Mathematically it also looks
+      like:
+
+      [[
+        {{2}, {0,1}, {0,1}}
+      ]]
+
+      but it uses different underlying occurrences.
+
+      The final expected result contains two groups of solutions because [P3] and
+      [P10] are both singleton rows for [M20].  They are distinct row-level exact
+      covers even though they decode to the same mathematical singleton block
+      [{2}].
+
+      Thus this example is intentionally a row-level exact-cover model of
+      multiset partitions.  The raw solver output is useful for checking the exact
+      rows selected, while a user-facing decoder can collapse occurrence labels
+      and duplicate mathematical partitions if desired.
+  *)
 
   Definition MI := (nat * nat)%type.
   Definition MC := nat.
