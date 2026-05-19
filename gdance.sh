@@ -146,6 +146,10 @@ mkdir -p "$MELANGE_DEST"
 rocq_compile
 rocq_doc
 
+log "Copying README.md into frontend public assets"
+mkdir -p "$ROOT_DIR/frontend/public"
+cp "$ROOT_DIR/README.md" "$ROOT_DIR/frontend/public/README.md"
+
 log "Building Melange target: dune build $DUNE_TARGET"
 
 cd "$ROOT_DIR"

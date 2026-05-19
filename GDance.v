@@ -1763,6 +1763,21 @@ Module GDance.
 (* Small executable examples                                                    *)
 (******************************************************************************)
 
+(** ** Worked examples and regression tests
+
+    The following examples are intentionally kept in the generated documentation.
+
+    They serve two purposes:
+
+    - executable regression tests, since each expected result is checked by
+      computation; and
+    - modeling examples, showing how to construct exact-cover and colored-DLX
+      problems directly from rows, primary items, colored items, and generated
+      problem families.
+
+    Readers who want to build their own GDance problems should start here.
+*)
+
 Module Examples.
 
   Definition I := string.
