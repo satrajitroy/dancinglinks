@@ -64,6 +64,97 @@ rocq_compile() {
   fi
 }
 
+rocq_stats() {
+  log "Generating Rocq build summary/stats"
+
+  mkdir -p "$ROOT_DIR/docs/stats"
+
+  local stats="$ROOT_DIR/docs/stats/GDance-summary.md"
+  local time_log="$ROOT_DIR/docs/stats/GDance-time.log"
+  local profile_json="$ROOT_DIR/docs/stats/GDance-profile.json"
+
+  {
+    echo "# GDance build summary"
+    echo
+    echo "Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+    echo
+    echo "## Tool versions"
+    echo
+    echo '```text'
+    if command -v rocq >/dev/null 2>&1; then
+      rocq --version || true
+    fi
+    if command -v coqc >/dev/null 2>&1; then
+      coqc --version || true
+    fi
+    if command -v dune >/dev/null 2>&1; then
+      dune --version || true
+    fi
+    if command -v node >/dev/null 2>&1; then
+      node --version || true
+    fi
+    if command -v npm >/dev/null 2>&1; then
+      npm --version || true
+    fi
+    echo '```'
+    echo
+    echo "## Source size"
+    echo
+    echo '```text'
+    wc -l "$ROOT_DIR/GDance.v" "$ROOT_DIR/README.md" 2>/dev/null || true
+    echo '```'
+    echo
+    echo "## Rocq declarations"
+    echo
+    echo '```text'
+    printf "Definitions: "; grep -Ec '^[[:space:]]*(Definition|Program Definition)\b' "$ROOT_DIR/GDance.v" || true
+    printf "Fixpoints:    "; grep -Ec '^[[:space:]]*Fixpoint\b' "$ROOT_DIR/GDance.v" || true
+    printf "Records:      "; grep -Ec '^[[:space:]]*Record\b' "$ROOT_DIR/GDance.v" || true
+    printf "Inductives:   "; grep -Ec '^[[:space:]]*Inductive\b' "$ROOT_DIR/GDance.v" || true
+    printf "Classes:      "; grep -Ec '^[[:space:]]*Class\b' "$ROOT_DIR/GDance.v" || true
+    printf "Instances:    "; grep -Ec '^[[:space:]]*(Global Instance|Instance)\b' "$ROOT_DIR/GDance.v" || true
+    printf "Lemmas:       "; grep -Ec '^[[:space:]]*Lemma\b' "$ROOT_DIR/GDance.v" || true
+    printf "Theorems:     "; grep -Ec '^[[:space:]]*Theorem\b' "$ROOT_DIR/GDance.v" || true
+    printf "Examples:     "; grep -Ec '^[[:space:]]*Example\b' "$ROOT_DIR/GDance.v" || true
+    echo '```'
+    echo
+    echo "## Generated artifacts"
+    echo
+    echo '```text'
+    ls -lh "$ROOT_DIR"/GDance.vo "$ROOT_DIR"/GDance.glob "$ROOT_DIR"/gdance.ml "$ROOT_DIR"/gdance.mli 2>/dev/null || true
+    ls -lh "$ROOT_DIR"/frontend/src/generated/gdance.js 2>/dev/null || true
+    echo '```'
+    echo
+    echo "## Timing"
+    echo
+    echo "Detailed command timing is in \`docs/stats/GDance-time.log\`."
+    echo
+    echo "## Profiling"
+    echo
+    echo "Detailed Rocq profiling trace is in \`docs/stats/GDance-profile.json\`."
+  } > "$stats"
+
+  log "Writing Rocq command timings to $time_log"
+
+  if command -v rocq >/dev/null 2>&1; then
+    rocq compile -time-file "$time_log" "$ROOT_DIR/GDance.v"
+  elif command -v coqc >/dev/null 2>&1; then
+    coqc -time-file "$time_log" "$ROOT_DIR/GDance.v"
+  else
+    die "Neither rocq nor coqc was found"
+  fi
+
+  log "Writing Rocq profile trace to $profile_json"
+
+  if command -v rocq >/dev/null 2>&1; then
+    rocq compile -profile "$profile_json" "$ROOT_DIR/GDance.v" || true
+  elif command -v coqc >/dev/null 2>&1; then
+    coqc -profile "$profile_json" "$ROOT_DIR/GDance.v" || true
+  fi
+
+  log "Rocq build summary written to $stats"
+}
+
 rocq_doc() {
   log "Generating Rocq documentation"
 
@@ -144,6 +235,7 @@ mkdir -p "$MELANGE_DEST"
 ###############################################################################
 
 rocq_compile
+rocq_stats
 rocq_doc
 
 log "Copying README.md into frontend public assets"

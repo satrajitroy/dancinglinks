@@ -15,13 +15,11 @@ The project includes:
 
 ## Provenance
 
-GDance is based on the author's own `gdance.c` implementation.
+GDance is based on the author's `gdance.c` implementation.
 
 The algorithmic background is Knuth's Algorithm X / Dancing Links. This project
 uses Knuth-style terminology such as cover, uncover, purify, primary items,
-secondary items, and colored constraints, but the verified Rocq implementation is
-a functional reconstruction of the author's own `gdance.c` design rather than a
-translation of Knuth's C sources.
+secondary items, and colored constraints.
 
 The Rocq version replaces pointers, mutable circular lists, global arrays, and
 destructive cover/uncover operations with immutable records, lists, residual
@@ -89,7 +87,7 @@ project.
 The file `frontend/src/generated/gdance.js` is generated from `GDance.v` through
 Rocq extraction, OCaml, Dune, and Melange.
 
-For the initial public demo, this generated JavaScript may be checked into the
+For the initial public demo, this generated JavaScript have been checked into the
 repository so GitHub Pages can deploy with only a Node/Vite build. A future CI
 workflow may regenerate this artifact automatically from `GDance.v`.
 

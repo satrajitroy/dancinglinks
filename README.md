@@ -52,6 +52,8 @@ regression tests. They are not hidden because they show how to model problems
 from scratch: how to choose primary items, how to build rows, how colored items
 affect compatibility, and how solver output corresponds to the modeled problem.
 
+- [Build summary](./docs/stats/GDance-summary.md)
+
 ## Browser demo limits
 
 The web demo materializes solution lists in JavaScript. Large instances may hit

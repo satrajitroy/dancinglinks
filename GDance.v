@@ -530,18 +530,18 @@ Module GDance.
 
           The soundness proof is organized around the behavior of [commit].
 
-          The central characterization lemma is [commit_rows_characterization], which
+          The central characterization lemma is [row_survives_commit_iff], which
           describes exactly which rows survive after a chosen row is committed.
 
           From that characterization we derive:
 
-          - [commit_preserves_problem_wf], showing that recursive calls remain
+          - [commit_preserves_wf], showing that recursive calls remain
             well-formed;
-          - [commit_removes_conflicts_with_chosen], showing that surviving rows do not
+          - [commit_survivors_compatible], showing that surviving rows do not
             conflict with the chosen row;
-          - [commit_primary_exactly_once_lift], showing that primary exactness lifts
+          - [commit_extends_primary], showing that primary exactness lifts
             from the recursive subproblem back to the original problem;
-          - [commit_solution_lifts], combining row membership, primary coverage, and
+          - [commit_extends_solution], combining row membership, primary coverage, and
             compatibility.
 
           These lemmas feed the main theorem [solve_sound].
@@ -719,7 +719,7 @@ Module GDance.
           exact Hwf.
       Qed.
 
-      Lemma commit_preserves_problem_wf :
+      Lemma commit_preserves_wf :
         forall (p : problem Item Color RowId) best r,
           problem_wf p ->
           In r (rows_with_col best (rows p)) ->
@@ -1098,7 +1098,7 @@ Module GDance.
               -- exact Hneq0.
       Qed.
 
-      Lemma commit_rows_characterization :
+      Lemma row_survives_commit_iff :
         forall p best r r',
           In r' (rows (commit best r p)) <->
           In r' (rows p) /\
@@ -1300,7 +1300,7 @@ Module GDance.
         - discriminate.
       Qed.
 
-      Lemma commit_removes_conflicts_with_chosen :
+      Lemma commit_survivors_compatible :
         forall (p : problem Item Color RowId) best r r',
           problem_wf p ->
           In r (rows_with_col best (rows p)) ->
@@ -1319,7 +1319,7 @@ Module GDance.
           apply existsb_exists in Hinner.
           destruct Hinner as [dj [Hdj Hconf]].
 
-          apply commit_rows_characterization in Hsurv.
+          apply row_survives_commit_iff in Hsurv.
           destruct Hsurv as [Hr'_p [Hbest_not Hsurv_cells]].
 
           unfold conflict_on_col in Hconf.
@@ -1486,7 +1486,7 @@ Module GDance.
       Proof.
         intros p best r r' i Hwf Hbest Hr Hi Hri Hr'_commit.
 
-        apply commit_rows_characterization in Hr'_commit.
+        apply row_survives_commit_iff in Hr'_commit.
         destruct Hr'_commit as [_ [Hbest_not Hsurv_cells]].
 
         destruct (eqb i best) eqn:Hi_best.
@@ -1534,7 +1534,7 @@ Module GDance.
           exact Hsurv_cells.
       Qed.
 
-      Lemma commit_primary_exactly_once_lift :
+      Lemma commit_extends_primary :
         forall (p : problem Item Color RowId) best r sol',
           problem_wf p ->
           In best (primary_items p) ->
@@ -1625,7 +1625,7 @@ Module GDance.
             * right. right. exact Hin.
       Qed.
 
-      Lemma commit_solution_lifts :
+      Lemma commit_extends_solution :
         forall (p : problem Item Color RowId) best r sol',
           problem_wf p ->
           In best (primary_items p) ->
@@ -1652,7 +1652,7 @@ Module GDance.
 
         - split.
           + (* primary_exactly_once *)
-            eapply commit_primary_exactly_once_lift.
+            eapply commit_extends_primary.
             * exact Hwf.
             * exact Hbest.
             * exact Hr.
@@ -1676,7 +1676,7 @@ Module GDance.
                 apply Hrows_tail.
                 exact Hb.
               }
-              eapply commit_removes_conflicts_with_chosen.
+              eapply commit_survivors_compatible.
               -- exact Hwf.
               -- exact Hr.
               -- exact Hb_rows_commit.
@@ -1690,7 +1690,7 @@ Module GDance.
                 exact Ha.
               }
               rewrite conflicts_with_symmetric.
-              eapply commit_removes_conflicts_with_chosen.
+              eapply commit_survivors_compatible.
               -- exact Hwf.
               -- exact Hr.
               -- exact Ha_rows_commit.
@@ -1736,7 +1736,7 @@ Module GDance.
               apply in_map_iff in Hin_r.
               destruct Hin_r as [sol' [Hsol Hin_sol']].
               subst sol.
-              assert (Hwf_commit : problem_wf (commit best r p)). { eapply commit_preserves_problem_wf; eauto. }
+              assert (Hwf_commit : problem_wf (commit best r p)). { eapply commit_preserves_wf; eauto. }
             * assert (Htail : valid_solution (commit best r p) sol').
               {
                 apply IH.
@@ -1744,7 +1744,7 @@ Module GDance.
                 - unfold solve.
                   exact Hin_sol'.
               }
-                eapply commit_solution_lifts.
+                eapply commit_extends_solution.
                 -- exact Hwf.
                 -- subst best.
                   rewrite Hprim.

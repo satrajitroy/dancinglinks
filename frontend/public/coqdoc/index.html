@@ -607,17 +607,16 @@
 <a href="GDance.html#GDance.col_len">GDance.col_len</a> [definition, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit">GDance.commit</a> [definition, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.committed_row_avoids_chosen_primary">GDance.committed_row_avoids_chosen_primary</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_solution_lifts">GDance.commit_solution_lifts</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_primary_exactly_once_lift">GDance.commit_primary_exactly_once_lift</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.commit_extends_solution">GDance.commit_extends_solution</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.commit_extends_primary">GDance.commit_extends_primary</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_preserves_uncovered_primary">GDance.commit_preserves_uncovered_primary</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell_preserves_primary_if_not_col">GDance.commit_other_cell_preserves_primary_if_not_col</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_removes_conflicts_with_chosen">GDance.commit_removes_conflicts_with_chosen</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_rows_characterization">GDance.commit_rows_characterization</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.commit_survivors_compatible">GDance.commit_survivors_compatible</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell_rows_characterization">GDance.commit_other_cell_rows_characterization</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_rows_subset">GDance.commit_rows_subset</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell_rows_subset">GDance.commit_other_cell_rows_subset</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_cell_rows_subset">GDance.commit_cell_rows_subset</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_preserves_problem_wf">GDance.commit_preserves_problem_wf</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.commit_preserves_wf">GDance.commit_preserves_wf</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell_preserves_problem_wf">GDance.commit_other_cell_preserves_problem_wf</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_cell_preserves_problem_wf">GDance.commit_cell_preserves_problem_wf</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell">GDance.commit_other_cell</a> [definition, in <a href="GDance.html">GDance</a>]<br/>
@@ -759,6 +758,7 @@
 <a href="GDance.html#GDance.row_no_duplicate_columns_from_problem_wf">GDance.row_no_duplicate_columns_from_problem_wf</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.row_has_col_false_no_cell">GDance.row_has_col_false_no_cell</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.row_has_col_of_in">GDance.row_has_col_of_in</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.row_survives_commit_iff">GDance.row_survives_commit_iff</a> [lemma, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.row_no_duplicate_columns">GDance.row_no_duplicate_columns</a> [definition, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.row_columns">GDance.row_columns</a> [definition, in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.row_color_ok">GDance.row_color_ok</a> [definition, in <a href="GDance.html">GDance</a>]<br/>
@@ -959,17 +959,16 @@
 <a href="GDance.html#GDance.choose_col_aux_in">GDance.choose_col_aux_in</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.colors_compatible_symmetric">GDance.colors_compatible_symmetric</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.committed_row_avoids_chosen_primary">GDance.committed_row_avoids_chosen_primary</a> [in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_solution_lifts">GDance.commit_solution_lifts</a> [in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_primary_exactly_once_lift">GDance.commit_primary_exactly_once_lift</a> [in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.commit_extends_solution">GDance.commit_extends_solution</a> [in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.commit_extends_primary">GDance.commit_extends_primary</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_preserves_uncovered_primary">GDance.commit_preserves_uncovered_primary</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell_preserves_primary_if_not_col">GDance.commit_other_cell_preserves_primary_if_not_col</a> [in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_removes_conflicts_with_chosen">GDance.commit_removes_conflicts_with_chosen</a> [in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_rows_characterization">GDance.commit_rows_characterization</a> [in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.commit_survivors_compatible">GDance.commit_survivors_compatible</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell_rows_characterization">GDance.commit_other_cell_rows_characterization</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_rows_subset">GDance.commit_rows_subset</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell_rows_subset">GDance.commit_other_cell_rows_subset</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_cell_rows_subset">GDance.commit_cell_rows_subset</a> [in <a href="GDance.html">GDance</a>]<br/>
-<a href="GDance.html#GDance.commit_preserves_problem_wf">GDance.commit_preserves_problem_wf</a> [in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.commit_preserves_wf">GDance.commit_preserves_wf</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_other_cell_preserves_problem_wf">GDance.commit_other_cell_preserves_problem_wf</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.commit_cell_preserves_problem_wf">GDance.commit_cell_preserves_problem_wf</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.conflicts_with_symmetric">GDance.conflicts_with_symmetric</a> [in <a href="GDance.html">GDance</a>]<br/>
@@ -999,6 +998,7 @@
 <a href="GDance.html#GDance.row_no_duplicate_columns_from_problem_wf">GDance.row_no_duplicate_columns_from_problem_wf</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.row_has_col_false_no_cell">GDance.row_has_col_false_no_cell</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.row_has_col_of_in">GDance.row_has_col_of_in</a> [in <a href="GDance.html">GDance</a>]<br/>
+<a href="GDance.html#GDance.row_survives_commit_iff">GDance.row_survives_commit_iff</a> [in <a href="GDance.html">GDance</a>]<br/>
 <a href="GDance.html#GDance.solve_sound">GDance.solve_sound</a> [in <a href="GDance.html">GDance</a>]<br/>
 <br/><br/><hr/>
 <h1>Inductive Index</h1>
