@@ -1,0 +1,5 @@
+gdance.ml linguist-generated=true
+gdance.mli linguist-generated=true
+frontend/src/generated/gdance.js linguist-generated=true
+docs/coqdoc/* linguist-generated=true
+frontend/public/coqdoc/* linguist-generated=true
