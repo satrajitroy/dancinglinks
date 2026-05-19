@@ -15,13 +15,11 @@ The project includes:
 
 ## Provenance
 
-GDance is based on the author's own `gdance.c` implementation.
+GDance is based on the author's `gdance.c` implementation.
 
 The algorithmic background is Knuth's Algorithm X / Dancing Links. This project
 uses Knuth-style terminology such as cover, uncover, purify, primary items,
-secondary items, and colored constraints, but the verified Rocq implementation is
-a functional reconstruction of the author's own `gdance.c` design rather than a
-translation of Knuth's C sources.
+secondary items, and colored constraints.
 
 The Rocq version replaces pointers, mutable circular lists, global arrays, and
 destructive cover/uncover operations with immutable records, lists, residual
