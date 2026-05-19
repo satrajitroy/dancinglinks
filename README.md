@@ -87,7 +87,7 @@ project.
 The file `frontend/src/generated/gdance.js` is generated from `GDance.v` through
 Rocq extraction, OCaml, Dune, and Melange.
 
-For the initial public demo, this generated JavaScript may be checked into the
+For the initial public demo, this generated JavaScript have been checked into the
 repository so GitHub Pages can deploy with only a Node/Vite build. A future CI
 workflow may regenerate this artifact automatically from `GDance.v`.
 
