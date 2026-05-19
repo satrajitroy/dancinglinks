@@ -45,6 +45,13 @@ This project does not currently claim completeness, fuel adequacy, or soundness
 for arbitrary malformed user-supplied problems without well-formedness
 assumptions.
 
+The next natural verification milestone is to prove that the generated problem
+families themselves produce well-formed GDance problems. The current development
+already proves soundness of the generic solver assuming `problem_wf`; with
+sufficient interest, future work will add well-formedness proofs for the public
+generators such as Sudoku, warehouse/scheduling-style problems, N-Queens,
+Langford pairs, partitions, and related combinatorics APIs.
+
 ## Worked examples
 
 The generated Rocq documentation intentionally includes worked examples and
@@ -92,6 +99,12 @@ Rocq extraction, OCaml, Dune, and Melange.
 For the initial public demo, this generated JavaScript have been checked into the
 repository so GitHub Pages can deploy with only a Node/Vite build. A future CI
 workflow may regenerate this artifact automatically from `GDance.v`.
+
+## Support
+
+GDance is free and open for research, education, and experimentation. If the
+project is useful to you, a GitHub star, issue report, citation, feedback, or
+small donation is appreciated, but never required.
 
 ## License and disclaimer
 

@@ -1,9 +1,214 @@
-import React, { useMemo } from "react";
-import { publicApis, runApiFromUrl } from "./API";
+import React, { useMemo, useState } from "react";
+import { runApiFromUrl } from "./API";
 
-function exampleUrl(api: string, query: string) {
-  return `/?api=${api}&${query}`;
+const BASE = import.meta.env.BASE_URL;
+
+function href(path: string): string {
+  return `${BASE}${path.replace(/^\/+/, "")}`;
 }
+
+function apiHref(api: string, params: [string, string][]): string {
+  const q = new URLSearchParams();
+  q.set("api", api);
+
+  for (const [name, value] of params) {
+    q.set(name, value);
+  }
+
+  return `${BASE}?${q.toString()}`;
+}
+
+type ParamSpec = {
+  name: string;
+  defaultValue: string;
+  hint?: string;
+};
+
+type ApiSpec = {
+  id: string;
+  title: string;
+  description: string;
+  params: ParamSpec[];
+  note?: string;
+};
+
+const API_SPECS: ApiSpec[] = [
+  {
+    id: "nqueens",
+    title: "N-Queens",
+    description: "Place n queens on an n×n board so that no two attack each other.",
+    params: [
+      { name: "n", defaultValue: "4" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+  {
+    id: "langford",
+    title: "Langford pairs",
+    description:
+      "Arrange two copies of each number 1..n so the two copies of k are separated by k positions.",
+    params: [
+      { name: "n", defaultValue: "3", hint: "Solutions exist for n ≡ 0 or 3 mod 4." },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+  {
+    id: "waerden",
+    title: "Van der Waerden colorings",
+    description:
+      "Generate q-colorings of 0..n−1 that avoid monochromatic arithmetic progressions of length k.",
+    params: [
+      { name: "n", defaultValue: "3" },
+      { name: "q", defaultValue: "2" },
+      { name: "k", defaultValue: "3" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+  {
+    id: "tuple",
+    title: "Tuples",
+    description: "Generated tuple universe encoded as an exact-cover problem.",
+    params: [
+      { name: "n", defaultValue: "3" },
+      { name: "k", defaultValue: "2" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+  {
+    id: "permutation",
+    title: "Permutations",
+    description: "Generate ordered selections without repetition.",
+    params: [
+      { name: "n", defaultValue: "4" },
+      { name: "k", defaultValue: "2" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+  {
+    id: "combination",
+    title: "Combinations",
+    description: "Generate unordered selections.",
+    params: [
+      { name: "n", defaultValue: "5" },
+      { name: "k", defaultValue: "3" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+  {
+    id: "partition",
+    title: "Integer partitions",
+    description: "Generate integer partitions of n.",
+    params: [
+      { name: "n", defaultValue: "5" },
+      { name: "fuel", defaultValue: "20" }
+    ]
+  },
+  {
+    id: "partition_k",
+    title: "Integer partitions into k parts",
+    description: "Generate integer partitions of n using exactly k parts.",
+    params: [
+      { name: "n", defaultValue: "5" },
+      { name: "k", defaultValue: "2" },
+      { name: "fuel", defaultValue: "20" }
+    ]
+  },
+  {
+    id: "set_partition_generated",
+    title: "Set partitions",
+    description: "Generate partitions of a finite set.",
+    params: [
+      { name: "n", defaultValue: "4" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+  {
+    id: "set_partition_k_generated",
+    title: "Set partitions into k blocks",
+    description:
+      "Generate set partitions using exactly k blocks. This labeled-block encoding may grow quickly.",
+    params: [
+      { name: "n", defaultValue: "5" },
+      { name: "k", defaultValue: "2" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+{
+  id: "multiset_partition_generated",
+  title: "Multiset partitions",
+  description: "Generate partitions of a multiset-style universe.",
+  params: [
+    { name: "n", defaultValue: "4" },
+    { name: "label_count", defaultValue: "2" },
+    { name: "fuel", defaultValue: "20" }
+  ]
+},
+{
+  id: "multiset_partition_k_generated",
+  title: "Multiset partitions into k parts",
+  description: "Generate multiset partitions using exactly k parts.",
+  params: [
+    { name: "n", defaultValue: "4" },
+    { name: "k", defaultValue: "2" },
+    { name: "label_count", defaultValue: "2" },
+    { name: "fuel", defaultValue: "20" }
+  ]
+},
+{
+  id: "sudoku_exact",
+  title: "Exact generalized Sudoku",
+  description:
+    "Sudoku-like exact-cover encoding where cell, row-symbol, column-symbol, and box-symbol constraints are primary.",
+  params: [
+    { name: "R", defaultValue: "2", hint: "Block/grid row factor." },
+    { name: "C", defaultValue: "2", hint: "Block/grid column factor." },
+    { name: "r", defaultValue: "2", hint: "Box row size." },
+    { name: "c", defaultValue: "2", hint: "Box column size." },
+    { name: "fuel", defaultValue: "20" }
+  ]
+},
+{
+  id: "sudoku_at_most",
+  title: "At-most generalized Sudoku",
+  description:
+    "Sudoku-like encoding with cells as primary constraints and row/column/box symbol constraints as at-most-once constraints.",
+  note:
+    "This API is kept as a modeling example, but nontrivial cases that truly exploit at-most-once constraints usually generate search spaces too large for the browser demo.",
+  params: [
+    { name: "R", defaultValue: "2", hint: "Block/grid row factor." },
+    { name: "C", defaultValue: "2", hint: "Block/grid column factor." },
+    { name: "r", defaultValue: "2", hint: "Box row size." },
+    { name: "c", defaultValue: "2", hint: "Box column size." },
+    { name: "fuel", defaultValue: "20" }
+  ]
+},
+  {
+    id: "warehouse_guaranteed",
+    title: "Guaranteed warehouse",
+    description:
+      "Generated warehouse/scheduling-style problem with at least k intended witness solutions.",
+    params: [
+      { name: "n_items", defaultValue: "12" },
+      { name: "n_sources", defaultValue: "4" },
+      { name: "k", defaultValue: "3" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  },
+  {
+    id: "warehouse_guaranteed_colored",
+    title: "Guaranteed colored warehouse",
+    description:
+      "Colored variant of the generated warehouse/scheduling-style problem.",
+    params: [
+      { name: "n_items", defaultValue: "12" },
+      { name: "n_sources", defaultValue: "4" },
+      { name: "n_product_colors", defaultValue: "3" },
+      { name: "n_source_reqs", defaultValue: "2" },
+      { name: "k", defaultValue: "3" },
+      { name: "fuel", defaultValue: "10" }
+    ]
+  }
+];
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -31,15 +236,6 @@ function compactJson(value: unknown, indent = 2, level = 0): string {
     return JSON.stringify(value);
   }
 
-  /*
-    Arrays that contain no objects are leaf-like from a JSON-object perspective.
-    Keep them horizontal.
-
-    Examples:
-      [1,3,0,2]
-      [[1,3,0,2],[2,0,3,1]]
-      [[[1],[2]],[[3],[4]]]
-  */
   if (Array.isArray(value)) {
     if (!containsPlainObjectBelow(value)) {
       return JSON.stringify(value);
@@ -60,15 +256,6 @@ function compactJson(value: unknown, indent = 2, level = 0): string {
     );
   }
 
-  /*
-    If this object has no child object anywhere below it, print the whole object
-    horizontally, even if it contains arrays.
-
-    Examples:
-      {"api":"nqueens","n":"4","fuel":"10"}
-      {"ok":true,"api":"partition_k","result":[[1,1,1,1,1]]}
-      {"witness":0,"source":1}
-  */
   if (!containsPlainObjectBelow(Object.values(value))) {
     return JSON.stringify(value);
   }
@@ -93,71 +280,215 @@ function compactJson(value: unknown, indent = 2, level = 0): string {
   );
 }
 
+function ApiCard({ spec }: { spec: ApiSpec }) {
+  const initial = Object.fromEntries(
+    spec.params.map((p) => [p.name, p.defaultValue])
+  ) as Record<string, string>;
 
-export default function App() {
-  const result = useMemo(() => runApiFromUrl(window.location.search), []);
+  const [values, setValues] = useState<Record<string, string>>(initial);
+
+  const url = apiHref(
+    spec.id,
+    spec.params.map((p) => [
+      p.name,
+      values[p.name] ?? p.defaultValue
+    ])
+  );
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "2rem" }}>
-      <h1>GDance / DLX GET API Demo</h1>
+    <section
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "12px",
+        padding: "1rem",
+        background: "#fff",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
+      }}
+    >
+      <h3 style={{ marginTop: 0 }}>{spec.title}</h3>
 
-      <p>
-        Pass parameters in the URL query string. Example:
-        <br />
-        <code>?api=nqueens&amp;n=4&amp;fuel=10</code>
+      <p style={{ marginBottom: "0.75rem", color: "#444" }}>
+        <code>{spec.id}</code> — {spec.description}
       </p>
 
-      <h2>Public APIs</h2>
-      <ul>
-        {publicApis.map((api) => (
-          <li key={api}>
-            <code>{api}</code>
-          </li>
-        ))}
-      </ul>
+      {spec.note ? (
+        <p
+          style={{
+            marginTop: "-0.25rem",
+            marginBottom: "0.75rem",
+            padding: "0.6rem 0.75rem",
+            borderRadius: "8px",
+            background: "#fff8e1",
+            border: "1px solid #e6d28a",
+            color: "#5f4b00",
+            fontSize: "0.9rem",
+            lineHeight: 1.4
+          }}
+        >
+          <strong>Browser note:</strong> {spec.note}
+        </p>
+      ) : null}
 
-      <h2>Example links</h2>
-      <ul>
-        <li>
-          <a href={exampleUrl("nqueens", "n=4&fuel=10")}>4-Queens</a>
-        </li>
-        <li>
-          <a href={exampleUrl("langford", "n=3&fuel=10")}>Langford n=3</a>
-        </li>
-        <li>
-          <a href={exampleUrl("waerden", "n=3&q=2&k=3&fuel=10")}>
-            Van der Waerden n=3 q=2 k=3
-          </a>
-        </li>
-        <li>
-          <a href={exampleUrl("set_partition_generated", "n=3&fuel=10")}>
-            Set partitions of 3
-          </a>
-        </li>
-        <li>
-          <a href={exampleUrl("warehouse_guaranteed", "n_items=4&n_sources=2&k=2&fuel=10")}>
-            Guaranteed warehouse
-          </a>
-        </li>
-        <li>
-          <a href={exampleUrl("sudoku_exact", "R=2&C=1&r=1&c=2&fuel=10")}>
-            Exact 2x2 Sudoku
-          </a>
-        </li>
-      </ul>
-
-      <h2>Result</h2>
-      <pre
+      <div
         style={{
-          background: result.ok ? "#f5f5f5" : "#fff0f0",
-          padding: "1rem",
-          borderRadius: "8px",
-          overflowX: "auto",
-          whiteSpace: "pre-wrap"
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+          gap: "0.75rem",
+          marginBottom: "0.75rem"
         }}
       >
-        {compactJson(result, null, 2)}
-      </pre>
+        {spec.params.map((param) => (
+          <label key={param.name} style={{ display: "grid", gap: "0.25rem" }}>
+            <span style={{ fontWeight: 600 }}>{param.name}</span>
+            <input
+              value={values[param.name] ?? ""}
+              onChange={(e) =>
+                setValues((old) => ({
+                  ...old,
+                  [param.name]: e.target.value
+                }))
+              }
+              style={{
+                padding: "0.45rem",
+                border: "1px solid #ccc",
+                borderRadius: "6px",
+                fontFamily: "monospace"
+              }}
+            />
+            {param.hint ? (
+              <small style={{ color: "#666" }}>{param.hint}</small>
+            ) : null}
+          </label>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+        <a
+          href={url}
+          style={{
+            display: "inline-block",
+            padding: "0.5rem 0.8rem",
+            borderRadius: "8px",
+            background: "#111",
+            color: "white",
+            textDecoration: "none",
+            fontWeight: 700
+          }}
+        >
+          Run
+        </a>
+
+        <code
+          style={{
+            padding: "0.5rem",
+            background: "#f5f5f5",
+            borderRadius: "8px",
+            overflowX: "auto",
+            maxWidth: "100%"
+          }}
+        >
+          {url}
+        </code>
+      </div>
+    </section>
+  );
+}
+
+export default function App() {
+  const search = window.location.search;
+  const result = useMemo(() => runApiFromUrl(search), [search]);
+  return (
+      <main
+        style={{
+          maxWidth: "1500px",
+          margin: "0 auto",
+          padding: "2rem",
+          fontFamily:
+            'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+        }}
+      >
+      <header style={{ marginBottom: "2rem" }}>
+        <h1>GDance browser demo</h1>
+
+        <p style={{ fontSize: "1.05rem", lineHeight: 1.5 }}>
+          A Rocq-verified functional Dancing Links / Algorithm X solver with
+          colored constraints. Each entry below shows the public API name,
+          editable URL parameters, and a runnable example.
+        </p>
+
+        <p>
+          <a href={href("README.md")}>README</a>
+          {" · "}
+          <a href={href("coqdoc/GDance.html")}>Rocq/coqdoc documentation</a>
+        </p>
+      </header>
+
+      <section style={{ marginBottom: "2rem" }}>
+        <h2>Public APIs</h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))",
+            gap: "1rem"
+          }}
+        >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: "1rem"
+          }}
+        >
+          {API_SPECS.map((spec) => (
+            <ApiCard key={spec.id} spec={spec} />
+          ))}
+        </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Result</h2>
+
+        <pre
+          style={{
+            background: "#f5f5f5",
+            padding: "1rem",
+            borderRadius: "8px",
+            overflowX: "auto",
+            whiteSpace: "pre",
+            maxHeight: "75vh",
+            fontSize: "0.9rem",
+            lineHeight: 1.4
+          }}
+        >
+          {compactJson(result, 2)}
+        </pre>
+      </section>
+
+      <footer
+        style={{
+          marginTop: "2.5rem",
+          paddingTop: "1rem",
+          borderTop: "1px solid #ddd",
+          color: "#555",
+          fontSize: "0.95rem",
+          lineHeight: 1.5
+        }}
+      >
+        <p>
+          <strong>Roadmap:</strong> The generic solver is proved sound for
+          well-formed problems. A natural next step is proving that the public
+          generated problem families are themselves well formed.
+        </p>
+
+        <p>
+          GDance is free for research, education, and experimentation. Stars,
+          feedback, citations, issue reports, and small donations are appreciated
+          but never required.
+        </p>
+      </footer>
+
     </main>
   );
 }

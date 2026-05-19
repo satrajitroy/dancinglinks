@@ -2,4 +2,4 @@
  (target melange)
  (emit_stdlib false)
  (modules gdance)
- (module_systems es6))
+ (module_systems esm))
