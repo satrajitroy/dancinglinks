@@ -302,12 +302,13 @@ function ApiCard({ spec }: { spec: ApiSpec }) {
         borderRadius: "12px",
         padding: "1rem",
         background: "#fff",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
+        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+        minWidth: 0
       }}
     >
       <h3 style={{ marginTop: 0 }}>{spec.title}</h3>
 
-      <p style={{ marginBottom: "0.75rem", color: "#444" }}>
+      <p style={{ marginBottom: "0.75rem", color: "#444", lineHeight: 1.45 }}>
         <code>{spec.id}</code> — {spec.description}
       </p>
 
@@ -332,14 +333,23 @@ function ApiCard({ spec }: { spec: ApiSpec }) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
           gap: "0.75rem",
-          marginBottom: "0.75rem"
+          marginBottom: "0.75rem",
+          minWidth: 0
         }}
       >
         {spec.params.map((param) => (
-          <label key={param.name} style={{ display: "grid", gap: "0.25rem" }}>
+          <label
+            key={param.name}
+            style={{
+              display: "grid",
+              gap: "0.25rem",
+              minWidth: 0
+            }}
+          >
             <span style={{ fontWeight: 600 }}>{param.name}</span>
+
             <input
               value={values[param.name] ?? ""}
               onChange={(e) =>
@@ -349,20 +359,40 @@ function ApiCard({ spec }: { spec: ApiSpec }) {
                 }))
               }
               style={{
+                width: "100%",
+                minWidth: 0,
+                boxSizing: "border-box",
                 padding: "0.45rem",
                 border: "1px solid #ccc",
                 borderRadius: "6px",
                 fontFamily: "monospace"
               }}
             />
+
             {param.hint ? (
-              <small style={{ color: "#666" }}>{param.hint}</small>
+              <small
+                style={{
+                  color: "#666",
+                  overflowWrap: "anywhere",
+                  lineHeight: 1.35
+                }}
+              >
+                {param.hint}
+              </small>
             ) : null}
           </label>
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "0.75rem",
+          flexWrap: "wrap",
+          alignItems: "center",
+          minWidth: 0
+        }}
+      >
         <a
           href={url}
           style={{
@@ -380,11 +410,14 @@ function ApiCard({ spec }: { spec: ApiSpec }) {
 
         <code
           style={{
+            display: "block",
             padding: "0.5rem",
             background: "#f5f5f5",
             borderRadius: "8px",
             overflowX: "auto",
-            maxWidth: "100%"
+            maxWidth: "100%",
+            minWidth: 0,
+            whiteSpace: "nowrap"
           }}
         >
           {url}
