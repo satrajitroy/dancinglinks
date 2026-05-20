@@ -1,6 +1,6 @@
 # GDance build summary
 
-Generated: 2026-05-19 20:42:06 UTC
+Generated: 2026-05-20 00:59:36 UTC
 
 ## Tool versions
 
@@ -16,8 +16,8 @@ v24.15.0
 
 ```text
   4588 /home/satrajit/dancinglinks/GDance.v
-   112 /home/satrajit/dancinglinks/README.md
-  4700 total
+   122 /home/satrajit/dancinglinks/README.md
+  4710 total
 ```
 
 ## Rocq declarations
@@ -37,10 +37,8 @@ Examples:     27
 ## Generated artifacts
 
 ```text
--rw-r--r-- 1 satrajit satrajit 352K May 19 16:42 /home/satrajit/dancinglinks/GDance.glob
--rw-r--r-- 1 satrajit satrajit 233K May 19 16:42 /home/satrajit/dancinglinks/GDance.vo
--rw-r--r-- 1 satrajit satrajit  48K May 19 16:42 /home/satrajit/dancinglinks/gdance.ml
--rw-r--r-- 1 satrajit satrajit  16K May 19 16:42 /home/satrajit/dancinglinks/gdance.mli
+-rw-r--r-- 1 satrajit satrajit 352K May 19 20:59 /home/satrajit/dancinglinks/GDance.glob
+-rw-r--r-- 1 satrajit satrajit 233K May 19 20:59 /home/satrajit/dancinglinks/GDance.vo
 ```
 
 ## Timing

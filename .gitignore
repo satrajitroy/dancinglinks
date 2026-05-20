@@ -8,10 +8,14 @@ Thumbs.db
 *.swo
 *.bak
 *.tmp
+*.out
 *.Zone.Identifier
 *:Zone.Identifier
 
 .dance
+/xcvr.exe
+/xcvr
+
 
 # --------------------------------------------------------------------
 # Rocq / Coq build artifacts

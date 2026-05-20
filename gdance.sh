@@ -28,6 +28,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/." && pwd)"
 
 FRONTEND_DIR="${FRONTEND_DIR:-$ROOT_DIR/web}"
 MELANGE_DEST="${MELANGE_DEST:-$FRONTEND_DIR/src/generated}"
+WEB_DUNE_TARGET="@web/melange"
 DUNE_TARGET="${DUNE_TARGET:-@melange}"
 NPM_BUILD_SCRIPT="${NPM_BUILD_SCRIPT:-build}"
 DEPLOY_DIR="${DEPLOY_DIR:-}"
@@ -64,9 +65,30 @@ rocq_compile() {
   fi
 }
 
+copy_generated_ocaml() {
+  log "Copying generated OCaml to native and web build directories"
+
+  mkdir -p "$ROOT_DIR/exe" "$ROOT_DIR/web"
+
+  if [ ! -f "$ROOT_DIR/src/gdance.ml" ]; then
+    die "Missing generated file: $ROOT_DIR/src/gdance.ml"
+  fi
+
+  if [ ! -f "$ROOT_DIR/src/gdance.mli" ]; then
+    die "Missing generated file: $ROOT_DIR/src/gdance.mli"
+  fi
+
+  cp "$ROOT_DIR/src/gdance.ml" "$ROOT_DIR/exe/gdance.ml"
+  cp "$ROOT_DIR/src/gdance.mli" "$ROOT_DIR/exe/gdance.mli"
+
+  cp "$ROOT_DIR/src/gdance.ml" "$ROOT_DIR/web/gdance.ml"
+  cp "$ROOT_DIR/src/gdance.mli" "$ROOT_DIR/web/gdance.mli"
+}
+
 rocq_stats() {
   log "Generating Rocq build summary/stats"
 
+  mkdir -p "$ROOT_DIR/src"
   mkdir -p "$ROOT_DIR/docs/stats"
 
   local stats="$ROOT_DIR/docs/stats/GDance-summary.md"
@@ -236,16 +258,31 @@ mkdir -p "$MELANGE_DEST"
 
 rocq_compile
 rocq_stats
+copy_generated_ocaml
 rocq_doc
 
 log "Copying README.md into frontend public assets"
 mkdir -p "$ROOT_DIR/frontend/public"
 cp "$ROOT_DIR/README.md" "$ROOT_DIR/frontend/public/README.md"
 
-log "Building Melange target: dune build $DUNE_TARGET"
+log "Building Melange target: dune build $WEB_DUNE_TARGET"
 
 cd "$ROOT_DIR"
-opam exec -- dune build "$DUNE_TARGET"
+opam exec -- dune build "$WEB_DUNE_TARGET"
+
+log "Building native exe"
+opam exec -- dune build ./exe/xcvr.exe
+
+log "Copying native executable to repo root"
+
+NATIVE_EXE="$ROOT_DIR/_build/default/exe/xcvr.exe"
+
+if [ ! -f "$NATIVE_EXE" ]; then
+  die "Native executable not found: $NATIVE_EXE"
+fi
+
+cp "$NATIVE_EXE" "$ROOT_DIR/xcvr"
+chmod 755 "$ROOT_DIR/xcvr"
 
 ###############################################################################
 # Locate Melange output

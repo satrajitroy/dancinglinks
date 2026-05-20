@@ -4540,7 +4540,7 @@ End PublicAPI.
 
 From Stdlib Require Import Extraction.
 Extraction Language OCaml.
-Set Extraction Output Directory ".".
+Set Extraction Output Directory "./src".
 Extraction "gdance.ml"
   PublicAPI.api_nqueens_ids
   PublicAPI.api_langford_ids

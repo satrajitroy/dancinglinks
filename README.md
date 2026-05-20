@@ -45,12 +45,22 @@ This project does not currently claim completeness, fuel adequacy, or soundness
 for arbitrary malformed user-supplied problems without well-formedness
 assumptions.
 
+## Future work
+
 The next natural verification milestone is to prove that the generated problem
 families themselves produce well-formed GDance problems. The current development
 already proves soundness of the generic solver assuming `problem_wf`; with
 sufficient interest, future work will add well-formedness proofs for the public
 generators such as Sudoku, warehouse/scheduling-style problems, N-Queens,
 Langford pairs, partitions, and related combinatorics APIs.
+
+The public APIs currently expose raw row-identifier solutions. The browser demo
+decodes many of these into more mathematical output, but the decoder logic is
+not yet part of the extracted Rocq API.
+
+If there is sufficient interest, a future version will add Rocq-side decoded
+APIs so that both the browser demo and native OCaml runner can share the same
+mathematical decoders directly from `GDance.v`.
 
 ## Worked examples
 

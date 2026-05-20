@@ -1,0 +1,3 @@
+(executable
+ (name xcvr)
+ (modules xcvr gdance))
